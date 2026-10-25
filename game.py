@@ -27,6 +27,16 @@ SCENES = [
             {"text": "Skip it for a quiet night", "effects": {"Extraversion": -1.5}},
         ],
     },
+        {
+        "id": "weekend",
+        "text": "Friday evening. You have a completely free weekend ahead.",
+        "options": [
+            {"text": "Write a plan for Saturday", "effects": {"Conscientiousness": 1.5}},
+            {"text": "Finish pending tasks first, then relax", "effects": {"Conscientiousness": 1.0}},
+            {"text": "Decide each morning what to do", "effects": {"Conscientiousness": -1.0}},
+            {"text": "Go with whatever friends suggest", "effects": {"Conscientiousness": -0.5, "Extraversion": 0.5}},
+        ],
+    },
 ]
 
 
