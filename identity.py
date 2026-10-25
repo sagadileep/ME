@@ -1,0 +1,17 @@
+name = input("What is your name? ").strip().title()
+country = input("Which country do you live in? ").strip().title()
+field = input("What do you study? ").strip().title()
+age_question = "What is your age? "
+age_text =input(age_question).strip()
+while not age_text.isdigit() or int(age_text) < 10 or int(age_text) > 120:
+    print("Please enter your age as a number between 10 and 120.")
+    age_text = input(age_question).strip()
+age = int(age_text)    
+color = input("What color do you like? ").strip().title()
+print ("--- ME identity card ---")
+print(f"Name: {name}")
+print(f"Country: {country}")
+print(f"Field: {field}")    
+print(f"Age: {age}")
+print(f"Color: {color}") 
+print(f"In 5 years you will be {age + 5}")
