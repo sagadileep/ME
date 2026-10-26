@@ -2,43 +2,17 @@
 # Plays scenes, updates the profile from each choice, and records answer speed.
 # Scenes: see "Scene bank v1" in the Domain map (draft).
 
+import json
 import time
+
+SCENES_FILE = "scenes.json"
 
 START = 4.0   # everyone starts in the middle (later: the 1M-dataset average)
 
-SCENES = [
-    {
-        "id": "restaurant",
-        "text": "A new restaurant. The menu has a dish you have never heard of.",
-        "options": [
-            {"text": "Order the unknown dish", "effects": {"Openness": 1.5}},
-            {"text": "Ask the waiter, then decide", "effects": {"Openness": 0.5, "Conscientiousness": 0.5}},
-            {"text": "Order a favourite you know", "effects": {"Openness": -1.0}},
-            {"text": "Share many dishes to taste", "effects": {"Openness": 1.0, "Extraversion": 0.5}},
-        ],
-    },
-    {
-        "id": "party",
-        "text": "You're invited to a party where you only know the host.",
-        "options": [
-            {"text": "Go and meet new people", "effects": {"Extraversion": 1.5}},
-            {"text": "Go, stay near the host, leave early", "effects": {"Extraversion": 0.0}},
-            {"text": "Suggest a small dinner instead", "effects": {"Extraversion": -0.5}},
-            {"text": "Skip it for a quiet night", "effects": {"Extraversion": -1.5}},
-        ],
-    },
-        {
-        "id": "weekend",
-        "text": "Friday evening. You have a completely free weekend ahead.",
-        "options": [
-            {"text": "Write a plan for Saturday", "effects": {"Conscientiousness": 1.5}},
-            {"text": "Finish pending tasks first, then relax", "effects": {"Conscientiousness": 1.0}},
-            {"text": "Decide each morning what to do", "effects": {"Conscientiousness": -1.0}},
-            {"text": "Go with whatever friends suggest", "effects": {"Conscientiousness": -0.5, "Extraversion": 0.5}},
-        ],
-    },
-]
-
+def load_scenes():
+    with open(SCENES_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data["scenes"]
 
 def clamp(score):
     return min(7.0, max(1.0, score))
@@ -68,7 +42,8 @@ def play(scenes):
 
 
 if __name__ == "__main__":
-    profile, log = play(SCENES)
+    scenes = load_scenes()
+    profile, log = play(scenes)
     print("\n--- What ME learned ---")
     for dimension, score in profile.items():
         print(f"{dimension}: {score}")
