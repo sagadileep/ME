@@ -1,7 +1,7 @@
 {
-  "version": "v1-draft",
-  "date": "2026-10-25",
-  "note": "Draft scene bank. Options turn public-domain IPIP behaviours (Goldberg) into choices; situations span the Situational Eight DIAMONDS (Rauthmann et al. 2014). Effect values are first guesses on the 1-7 scale, to be calibrated against TIPI results.",
+  "version": "v2-draft",
+  "date": "2026-10-26",
+  "note": "Draft scene bank. Options turn public-domain IPIP behaviours (Goldberg) into choices; situations span the Situational Eight DIAMONDS (Rauthmann et al. 2014). Effect values are first guesses on the 1-7 scale, to be calibrated against TIPI results. v2: restaurant option 4 now measures spending on experience; two twin scenes (twin_of) re-measure Extraversion and Openness in a new situation, for the sincerity check.",
   "scenes": [
     {
       "id": "restaurant",
@@ -9,10 +9,33 @@
       "type": "text",
       "text": "A new restaurant. The menu has a dish you have never heard of.",
       "options": [
-        {"text": "Order the unknown dish", "effects": {"Openness": 1.5}},
-        {"text": "Ask the waiter, then decide", "effects": {"Openness": 0.5, "Conscientiousness": 0.5}},
-        {"text": "Order a favourite you know", "effects": {"Openness": -1.0}},
-        {"text": "Share many dishes to taste", "effects": {"Openness": 1.0, "Extraversion": 0.5}}
+        {
+          "text": "Order the unknown dish",
+          "effects": {
+            "Openness": 1.5
+          }
+        },
+        {
+          "text": "Ask the waiter, then decide",
+          "effects": {
+            "Openness": 0.5,
+            "Conscientiousness": 0.5
+          }
+        },
+        {
+          "text": "Order a favourite you know",
+          "effects": {
+            "Openness": -1.0
+          }
+        },
+        {
+          "text": "Order many dishes for the table",
+          "effects": {
+            "Stimulation": 1.0,
+            "Extraversion": 0.5,
+            "Security": -0.5
+          }
+        }
       ]
     },
     {
@@ -21,10 +44,31 @@
       "type": "text",
       "text": "Friday evening. You have a completely free weekend ahead.",
       "options": [
-        {"text": "Write a plan for Saturday", "effects": {"Conscientiousness": 1.5}},
-        {"text": "Finish pending tasks first, then relax", "effects": {"Conscientiousness": 1.0}},
-        {"text": "Decide each morning what to do", "effects": {"Conscientiousness": -1.0}},
-        {"text": "Go with whatever friends suggest", "effects": {"Conscientiousness": -0.5, "Extraversion": 0.5}}
+        {
+          "text": "Write a plan for Saturday",
+          "effects": {
+            "Conscientiousness": 1.5
+          }
+        },
+        {
+          "text": "Finish pending tasks first, then relax",
+          "effects": {
+            "Conscientiousness": 1.0
+          }
+        },
+        {
+          "text": "Decide each morning what to do",
+          "effects": {
+            "Conscientiousness": -1.0
+          }
+        },
+        {
+          "text": "Go with whatever friends suggest",
+          "effects": {
+            "Conscientiousness": -0.5,
+            "Extraversion": 0.5
+          }
+        }
       ]
     },
     {
@@ -33,10 +77,30 @@
       "type": "text",
       "text": "You're invited to a party where you only know the host.",
       "options": [
-        {"text": "Go and meet new people", "effects": {"Extraversion": 1.5}},
-        {"text": "Go, stay near the host, leave early", "effects": {"Extraversion": 0.0}},
-        {"text": "Suggest a small dinner instead", "effects": {"Extraversion": -0.5}},
-        {"text": "Skip it for a quiet night", "effects": {"Extraversion": -1.5}}
+        {
+          "text": "Go and meet new people",
+          "effects": {
+            "Extraversion": 1.5
+          }
+        },
+        {
+          "text": "Go, stay near the host, leave early",
+          "effects": {
+            "Extraversion": 0.0
+          }
+        },
+        {
+          "text": "Suggest a small dinner instead",
+          "effects": {
+            "Extraversion": -0.5
+          }
+        },
+        {
+          "text": "Skip it for a quiet night",
+          "effects": {
+            "Extraversion": -1.5
+          }
+        }
       ]
     },
     {
@@ -45,10 +109,31 @@
       "type": "text",
       "text": "A friend proudly shows you a project. Honestly, you think it's weak.",
       "options": [
-        {"text": "Say clearly what's weak", "effects": {"Agreeableness": -1.5}},
-        {"text": "Praise it first, then give one gentle tip", "effects": {"Agreeableness": 0.5}},
-        {"text": "Only praise it", "effects": {"Agreeableness": 1.5}},
-        {"text": "Ask questions so they find the issues", "effects": {"Agreeableness": 0.5, "Openness": 0.5}}
+        {
+          "text": "Say clearly what's weak",
+          "effects": {
+            "Agreeableness": -1.5
+          }
+        },
+        {
+          "text": "Praise it first, then give one gentle tip",
+          "effects": {
+            "Agreeableness": 0.5
+          }
+        },
+        {
+          "text": "Only praise it",
+          "effects": {
+            "Agreeableness": 1.5
+          }
+        },
+        {
+          "text": "Ask questions so they find the issues",
+          "effects": {
+            "Agreeableness": 0.5,
+            "Openness": 0.5
+          }
+        }
       ]
     },
     {
@@ -57,10 +142,31 @@
       "type": "text",
       "text": "Your train is cancelled. You'll be late for something important.",
       "options": [
-        {"text": "Calmly look for another route", "effects": {"Emotional Stability": 1.5, "Conscientiousness": 0.5}},
-        {"text": "Message ahead and accept it", "effects": {"Emotional Stability": 1.0}},
-        {"text": "Keep checking the app, feeling tense", "effects": {"Emotional Stability": -1.0}},
-        {"text": "Get frustrated and vent", "effects": {"Emotional Stability": -1.5}}
+        {
+          "text": "Calmly look for another route",
+          "effects": {
+            "Emotional Stability": 1.5,
+            "Conscientiousness": 0.5
+          }
+        },
+        {
+          "text": "Message ahead and accept it",
+          "effects": {
+            "Emotional Stability": 1.0
+          }
+        },
+        {
+          "text": "Keep checking the app, feeling tense",
+          "effects": {
+            "Emotional Stability": -1.0
+          }
+        },
+        {
+          "text": "Get frustrated and vent",
+          "effects": {
+            "Emotional Stability": -1.5
+          }
+        }
       ]
     },
     {
@@ -69,10 +175,31 @@
       "type": "text",
       "text": "You need new headphones. There are 40 options online.",
       "options": [
-        {"text": "Compare reviews until you find the best", "effects": {"Maximizing": 1.5}},
-        {"text": "Pick the first good-enough one", "effects": {"Maximizing": -1.5}},
-        {"text": "Ask a friend who knows", "effects": {"Relies on others": 1.5}},
-        {"text": "Buy the brand you trust", "effects": {"Intuitive": 1.5, "Maximizing": -0.5}}
+        {
+          "text": "Compare reviews until you find the best",
+          "effects": {
+            "Maximizing": 1.5
+          }
+        },
+        {
+          "text": "Pick the first good-enough one",
+          "effects": {
+            "Maximizing": -1.5
+          }
+        },
+        {
+          "text": "Ask a friend who knows",
+          "effects": {
+            "Relies on others": 1.5
+          }
+        },
+        {
+          "text": "Buy the brand you trust",
+          "effects": {
+            "Intuitive": 1.5,
+            "Maximizing": -0.5
+          }
+        }
       ]
     },
     {
@@ -81,10 +208,72 @@
       "type": "pictures",
       "text": "You're setting up your new room. Which one feels like you?",
       "options": [
-        {"text": "Clean, white, minimal", "image": null, "effects": {"Minimal vs expressive": -1.5, "Dark vs bright": 1.5}},
-        {"text": "Warm wood and soft light", "image": null, "effects": {"Warm vs cool": -1.5, "Natural vs polished": -1.5}},
-        {"text": "Bold colours and art", "image": null, "effects": {"Minimal vs expressive": 1.5, "Dark vs bright": 0.5}},
-        {"text": "Dark, sleek, modern", "image": null, "effects": {"Dark vs bright": -1.5, "Warm vs cool": 1.0, "Natural vs polished": 1.5}}
+        {
+          "text": "Clean, white, minimal",
+          "image": null,
+          "effects": {
+            "Minimal vs expressive": -1.5,
+            "Dark vs bright": 1.5
+          }
+        },
+        {
+          "text": "Warm wood and soft light",
+          "image": null,
+          "effects": {
+            "Warm vs cool": -1.5,
+            "Natural vs polished": -1.5
+          }
+        },
+        {
+          "text": "Bold colours and art",
+          "image": null,
+          "effects": {
+            "Minimal vs expressive": 1.5,
+            "Dark vs bright": 0.5
+          }
+        },
+        {
+          "text": "Dark, sleek, modern",
+          "image": null,
+          "effects": {
+            "Dark vs bright": -1.5,
+            "Warm vs cool": 1.0,
+            "Natural vs polished": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "flight_chat",
+      "target": "Extraversion",
+      "twin_of": "party",
+      "type": "text",
+      "text": "A long flight. The person next to you starts chatting.",
+      "options": [
+        {
+          "text": "Chat happily for most of the flight",
+          "effects": {
+            "Extraversion": 1.5
+          }
+        },
+        {
+          "text": "Chat a bit, then read or watch something",
+          "effects": {
+            "Extraversion": 0.0
+          }
+        },
+        {
+          "text": "Give short, polite answers",
+          "effects": {
+            "Extraversion": -1.0
+          }
+        },
+        {
+          "text": "Put on headphones right away",
+          "effects": {
+            "Extraversion": -1.5
+          }
+        }
       ]
     },
     {
@@ -93,10 +282,65 @@
       "type": "text",
       "text": "You unexpectedly get 500 euros.",
       "options": [
-        {"text": "Save it", "effects": {"Security": 1.5}},
-        {"text": "Spend it on a trip or experience", "effects": {"Stimulation": 1.5}},
-        {"text": "Use it to help or treat someone", "effects": {"Benevolence": 1.5}},
-        {"text": "Invest in a course or new skill", "effects": {"Achievement": 1.5}}
+        {
+          "text": "Save it",
+          "effects": {
+            "Security": 1.5
+          }
+        },
+        {
+          "text": "Spend it on a trip or experience",
+          "effects": {
+            "Stimulation": 1.5
+          }
+        },
+        {
+          "text": "Use it to help or treat someone",
+          "effects": {
+            "Benevolence": 1.5
+          }
+        },
+        {
+          "text": "Invest in a course or new skill",
+          "effects": {
+            "Achievement": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "spare_ticket",
+      "target": "Openness",
+      "twin_of": "restaurant",
+      "type": "text",
+      "text": "A friend offers you a spare ticket tonight, for an event you know nothing about.",
+      "options": [
+        {
+          "text": "Go, curious to see what it is",
+          "effects": {
+            "Openness": 1.5
+          }
+        },
+        {
+          "text": "Look it up first, then decide",
+          "effects": {
+            "Openness": 0.5,
+            "Conscientiousness": 0.5
+          }
+        },
+        {
+          "text": "Decline and keep your evening as planned",
+          "effects": {
+            "Openness": -1.0
+          }
+        },
+        {
+          "text": "Go, mainly to spend time with your friend",
+          "effects": {
+            "Openness": 0.5,
+            "Extraversion": 0.5
+          }
+        }
       ]
     }
   ]

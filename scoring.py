@@ -54,6 +54,5 @@ if __name__ == "__main__":
     my_scores = score_tipi(my_answers)
     for trait, score in my_scores.items():
         print(f"{trait}: {score} ({describe(score)})")
-
-friend = [4, 2, 6, 2, 6, 6, 5, 2, 6, 5]
-print(confidence_tipi(friend))
+    friend = [4, 2, 6, 2, 6, 6, 5, 2, 6, 5]
+    print(confidence_tipi(friend))
