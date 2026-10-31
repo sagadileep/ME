@@ -1,7 +1,7 @@
 {
-  "version": "v2-draft",
-  "date": "2026-10-26",
-  "note": "Draft scene bank. Options turn public-domain IPIP behaviours (Goldberg) into choices; situations span the Situational Eight DIAMONDS (Rauthmann et al. 2014). Effect values are first guesses on the 1-7 scale, to be calibrated against TIPI results. v2: restaurant option 4 now measures spending on experience; two twin scenes (twin_of) re-measure Extraversion and Openness in a new situation, for the sincerity check.",
+  "version": "v5-draft",
+  "date": "2026-10-31",
+  "note": "Draft scene bank. Options turn public-domain IPIP behaviours (Goldberg) into choices; situations span the Situational Eight DIAMONDS (Rauthmann et al. 2014). Effect values are first guesses on the 1-7 scale, to be calibrated against TIPI results. v2: restaurant option 4 now measures spending on experience; two twin scenes (twin_of) re-measure Extraversion and Openness in a new situation, for the sincerity check. v3: restaurant gets a 5th option, the restaurant's special (trusted novelty). v4: 'ask the waiter' and 'look it up first' are careful, not open (Openness 0); new duty scene for the dependable side of Conscientiousness (Lokesh test, 26 Oct). v5: life-stage wording (variants). A variant changes only the words; target, options order and effects stay the same, so results stay comparable. Life stage is never used to predict personality.",
   "scenes": [
     {
       "id": "restaurant",
@@ -18,8 +18,8 @@
         {
           "text": "Ask the waiter, then decide",
           "effects": {
-            "Openness": 0.5,
-            "Conscientiousness": 0.5
+            "Conscientiousness": 0.5,
+            "Relies on others": 0.5
           }
         },
         {
@@ -34,6 +34,12 @@
             "Stimulation": 1.0,
             "Extraversion": 0.5,
             "Security": -0.5
+          }
+        },
+        {
+          "text": "Order the restaurant's special",
+          "effects": {
+            "Openness": 0.5
           }
         }
       ]
@@ -69,7 +75,19 @@
             "Extraversion": 0.5
           }
         }
-      ]
+      ],
+      "facet": "planning",
+      "variants": {
+        "retired": {
+          "text": "Next week you have nothing planned at all.",
+          "options": [
+            "Write a plan for the week",
+            "Finish jobs at home first, then relax",
+            "Decide each morning what to do",
+            "Go along with whatever friends or family suggest"
+          ]
+        }
+      }
     },
     {
       "id": "party",
@@ -101,7 +119,18 @@
             "Extraversion": -1.5
           }
         }
-      ]
+      ],
+      "variants": {
+        "retired": {
+          "text": "You're invited to a neighbour's birthday gathering where you only know the host.",
+          "options": [
+            "Go and meet new people",
+            "Go, stay near the host, leave early",
+            "Suggest meeting them for coffee instead",
+            "Stay home for a quiet evening"
+          ]
+        }
+      }
     },
     {
       "id": "friend_project",
@@ -134,7 +163,69 @@
             "Openness": 0.5
           }
         }
-      ]
+      ],
+      "variants": {
+        "working": {
+          "text": "A colleague proudly shows you their work. Honestly, you think it's weak."
+        },
+        "retired": {
+          "text": "A friend proudly shows you something they made, like a painting or a dish. Honestly, you think it's weak."
+        }
+      }
+    },
+    {
+      "id": "promise",
+      "target": "Conscientiousness",
+      "facet": "dependability",
+      "type": "text",
+      "text": "You promised a friend your notes by tonight. It's 10 pm and you're tired.",
+      "options": [
+        {
+          "text": "Send them now, as promised",
+          "effects": {
+            "Conscientiousness": 1.5
+          }
+        },
+        {
+          "text": "Send a short version now, the rest tomorrow",
+          "effects": {
+            "Conscientiousness": 0.5,
+            "Agreeableness": 0.5
+          }
+        },
+        {
+          "text": "Message them that it will be tomorrow",
+          "effects": {
+            "Conscientiousness": -0.5
+          }
+        },
+        {
+          "text": "Leave it until they ask",
+          "effects": {
+            "Conscientiousness": -1.5
+          }
+        }
+      ],
+      "variants": {
+        "working": {
+          "text": "You promised a colleague a document by tonight. It's 10 pm and you're tired.",
+          "options": [
+            "Send it now, as promised",
+            "Send a short version now, the rest tomorrow",
+            "Message them that it will be tomorrow",
+            "Leave it until they ask"
+          ]
+        },
+        "retired": {
+          "text": "You promised your neighbour you'd help tomorrow morning. Tonight you feel tired and want to sleep in.",
+          "options": [
+            "Go and help as promised",
+            "Help for a short while, then say you need rest",
+            "Tell them tonight it has to be another day",
+            "Don't go, and wait to see if they mention it"
+          ]
+        }
+      }
     },
     {
       "id": "train",
@@ -200,7 +291,18 @@
             "Maximizing": -0.5
           }
         }
-      ]
+      ],
+      "variants": {
+        "retired": {
+          "text": "You need a new mobile phone. The shop has many models.",
+          "options": [
+            "Compare them all until you find the best",
+            "Pick the first good-enough one",
+            "Ask someone who knows",
+            "Buy the brand you trust"
+          ]
+        }
+      }
     },
     {
       "id": "room",
@@ -241,7 +343,15 @@
             "Natural vs polished": 1.5
           }
         }
-      ]
+      ],
+      "variants": {
+        "working": {
+          "text": "You're redecorating your living room. Which one feels like you?"
+        },
+        "retired": {
+          "text": "You're redecorating your living room. Which one feels like you?"
+        }
+      }
     },
     {
       "id": "flight_chat",
@@ -324,8 +434,8 @@
         {
           "text": "Look it up first, then decide",
           "effects": {
-            "Openness": 0.5,
-            "Conscientiousness": 0.5
+            "Conscientiousness": 0.5,
+            "Maximizing": 0.5
           }
         },
         {
@@ -343,5 +453,12 @@
         }
       ]
     }
+  ],
+  "life_stages": [
+    "school",
+    "studying",
+    "working",
+    "retired",
+    "other"
   ]
 }
