@@ -12,6 +12,7 @@ from datetime import datetime
 SCENES_FILE = "scenes.json"
 GAME_RESULTS_FILE = "game_results.json"
 START = 4.0   # everyone starts in the middle (later: the 1M-dataset average)
+STRETCH = 2.0  # turns an average change (-1.5 to +1.5) into the 1-7 scale (1 to 7)
 # "It depends" follow-up: reason -> the two situations to compare
 DEPENDS_ON = {
     "1": ("Mood", "when you're in a good mood", "when you're tired or irritated"),
@@ -107,9 +108,24 @@ def ask_twin_followups(log, scenes, stage):
         followups.append(followup)
     return followups
 
+def build_profile(log):
+    # Collect every change per dimension, then average them.
+    changes = {}
+    for entry in log:
+        for dimension, change in entry["effects"].items():
+            if dimension not in changes:
+                changes[dimension] = []
+            changes[dimension].append(change)
+
+    profile = {}
+    evidence = {}
+    for dimension, values in changes.items():
+        average = sum(values) / len(values)
+        profile[dimension] = round(clamp(START + average * STRETCH), 2)
+        evidence[dimension] = len(values)
+    return profile, evidence
 
 def play(scenes, stage):
-    profile = {}
     log = []
     for scene in scenes:
         print()
@@ -137,11 +153,8 @@ def play(scenes, stage):
             option = options[int(choice) - 1]
             entry["choice"] = option["text"]
             entry["effects"] = option["effects"]
-
-        for dimension, change in entry["effects"].items():
-            profile[dimension] = clamp(profile.get(dimension, START) + change)
         log.append(entry)
-    return profile, log
+    return log
 
 
 if __name__ == "__main__":
@@ -152,17 +165,18 @@ if __name__ == "__main__":
     person = input("Who is playing? ").strip().title()
     stage = ask_life_stage()
     scenes, version = load_scenes()
-    profile, log = play(scenes, stage)
+    log = play(scenes, stage)
+    profile, evidence = build_profile(log)
     followups = ask_twin_followups(log, scenes, stage)
     explained = [f["second"] for f in followups if f["depends_on"]]
     print("\n--- What ME learned ---")
-    for dimension, score in profile.items():
-        print(f"{dimension}: {score}")
     for entry in log:
         print(f"{entry['scene']}: '{entry['choice']}' in {entry['seconds']} s")
         if "cases" in entry:
             for case, choice_text in entry["cases"].items():
                 print(f"    {case}: {choice_text}")
+    for dimension, score in profile.items():
+        print(f"{dimension}: {score} (from {evidence[dimension]} scenes)")
     warnings = sincerity_report(log, scenes, explained)
     if warnings:
         print("\nME is not confident in these answers yet:")
@@ -176,6 +190,7 @@ if __name__ == "__main__":
         "scenes_version": version,
         "life_stage": stage,
         "profile": profile,
+        "evidence": evidence,
         "log": log,
         "twin_followups": followups,
         "warnings": warnings,
