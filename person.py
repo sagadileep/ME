@@ -9,6 +9,7 @@ from game import GAME_RESULTS_FILE
 START = 4.0               # no information yet: the middle of the 1-7 scale
 QUESTIONNAIRE_WEIGHT = 2  # TIPI measures each trait with 2 questions
 GAP = 1.5                 # says vs does this far apart is worth noticing
+PRIOR_STRENGTH = 2        # shrinkage: every estimate starts with 2 'neutral' scenes at 4.0
 
 class Profile:
     def __init__(self, name):
@@ -32,8 +33,8 @@ class Profile:
 
     def trait(self, name):
         # Best estimate: a weighted average of what they say and what they do.
-        total = 0
-        weights = 0
+        total = START * PRIOR_STRENGTH
+        weights = PRIOR_STRENGTH
         if name in self.says:
             total = total + self.says[name] * QUESTIONNAIRE_WEIGHT
             weights = weights + QUESTIONNAIRE_WEIGHT
@@ -41,25 +42,29 @@ class Profile:
             scenes = self.evidence.get(name, 1)
             total = total + self.does[name] * scenes
             weights = weights + scenes
-        if weights == 0:
-            return START
         return round(total / weights, 2)
+
+    def shrunk(self, name):
+        # Game score pulled toward the middle when it rests on few scenes.
+        scenes = self.evidence.get(name, 1)
+        raw = self.does[name]
+        return round((raw * scenes + START * PRIOR_STRENGTH) / (scenes + PRIOR_STRENGTH), 2)
     
     def gaps(self):
         # Traits where what the person says and what they do differ a lot.
         found = []
         for name in TRAITS:
             if name in self.says and name in self.does:
-                difference = self.does[name] - self.says[name]
+                difference = self.shrunk(name) - self.says[name]
                 if abs(difference) >= GAP:
-                    found.append((name, self.says[name], self.does[name]))
+                    found.append((name, self.says[name], self.shrunk(name)))
         return found
     
     def summary(self):
         print(f"--- {self.name} ---")
         for name in TRAITS:
             says = self.says.get(name, "-")
-            does = self.does.get(name, "-")
+            does = self.shrunk(name) if name in self.does else "-"            
             print(f"{name}: says {says}, does {does} -> ME's estimate {self.trait(name)}")
         for entry in self.depends:
             print(f"It depends ({entry['scene']}): {entry['depends_on']}")
