@@ -20,30 +20,30 @@ def same_number_check(log):
     for entry in log:
         numbers.append(entry["number"])
     most = 0
-    for n in [1, 2, 3, 4]:
+    for n in numbers:
         if numbers.count(n) > most:
             most = numbers.count(n)
     return most / len(numbers)
 
 def twin_check(log, scenes):
+    # Returns the twin pairs whose answers point in opposite directions.
     answers = {}
     for entry in log:
         answers[entry["scene"]] = entry["effects"]
 
-    contradictions = []
+    clashes = []
     for scene in scenes:
         if "twin_of" in scene:
             target = scene["target"]
             first = answers[scene["twin_of"]].get(target, 0)
             second = answers[scene["id"]].get(target, 0)
             if abs(first - second) >= MAX_TWIN_GAP:
-                contradictions.append(
-                    f"'{scene['twin_of']}' and '{scene['id']}' disagree about {target}"
-                )
-    return contradictions
+                clashes.append({"first": scene["twin_of"], "second": scene["id"], "target": target})
+    return clashes
 
 
-def sincerity_report(log, scenes):
+def sincerity_report(log, scenes, explained):
+    # explained = twin scenes the player explained with "it depends" (no warning for those)
     warnings = []
     fast = speed_check(log)
     if fast > MAX_FAST:
@@ -51,6 +51,8 @@ def sincerity_report(log, scenes):
     share = same_number_check(log)
     if share >= MAX_SAME_SHARE:
         warnings.append(f"{round(share * 100)}% of answers used the same number")
-    warnings.extend(twin_check(log, scenes))
+    for clash in twin_check(log, scenes):
+        if clash["second"] not in explained:
+            warnings.append(f"'{clash['first']}' and '{clash['second']}' disagree about {clash['target']}")
     return warnings
     
