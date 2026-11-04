@@ -1,0 +1,512 @@
+{
+  "version": "v2-draft",
+  "date": "2026-11-01",
+  "note": "Prediction test: 8 domains x 4 age groups. Same option ids and weights in every age version; only wording changes. Weights: 0.5 = published study, 0.25 = hypothesis. Model: multinomial logit (McFadden 1974), strength k. See the Prediction test tab in the Master Plan.",
+  "age_groups": [
+    "16-24",
+    "25-44",
+    "45-64",
+    "65+"
+  ],
+  "strength": 2.0,
+  "questions": [
+    {
+      "id": "fashion",
+      "domain": "Fashion",
+      "touched_by_game": false,
+      "options": [
+        {
+          "id": "classic",
+          "text": "A classic dark coat that goes with everything",
+          "weights": {
+            "Openness": -0.5,
+            "Conscientiousness": 0.5
+          },
+          "basis": "Naumann et al. 2009"
+        },
+        {
+          "id": "statement",
+          "text": "A statement jacket in a bold colour or unusual cut",
+          "weights": {
+            "Openness": 0.5,
+            "Extraversion": 0.5
+          },
+          "basis": "Naumann et al. 2009"
+        },
+        {
+          "id": "sporty",
+          "text": "A sporty, functional jacket with lots of pockets",
+          "weights": {
+            "Conscientiousness": 0.25,
+            "Extraversion": 0.25
+          },
+          "basis": "Hypothesis"
+        },
+        {
+          "id": "vintage",
+          "text": "A vintage or second-hand jacket with character",
+          "weights": {
+            "Openness": 0.5,
+            "Conscientiousness": -0.25
+          },
+          "basis": "Hypothesis"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "You're buying one jacket for the next few years, for school, uni or going out. They all cost the same. Which one?",
+          "options": {}
+        },
+        "25-44": {
+          "text": "You're buying one jacket for the next few years, for work and weekends. They all cost the same. Which one?",
+          "options": {}
+        },
+        "45-64": {
+          "text": "You're buying one jacket for the next few years, for work and weekends. They all cost the same. Which one?",
+          "options": {}
+        },
+        "65+": {
+          "text": "You're buying one good coat to wear for the next few years. They all cost the same. Which one?",
+          "options": {
+            "statement": "A coat in a bold colour or unusual cut"
+          }
+        }
+      }
+    },
+    {
+      "id": "home",
+      "domain": "Home",
+      "touched_by_game": true,
+      "options": [
+        {
+          "id": "empty",
+          "text": "Nothing: a clean, calm wall",
+          "weights": {
+            "Openness": -0.5,
+            "Conscientiousness": 0.5
+          },
+          "basis": "Gosling et al. 2002"
+        },
+        {
+          "id": "art",
+          "text": "A big piece of art or a poster you love",
+          "weights": {
+            "Openness": 0.5
+          },
+          "basis": "Gosling et al. 2002"
+        },
+        {
+          "id": "photos",
+          "text": "Photos of friends and family",
+          "weights": {
+            "Extraversion": 0.25,
+            "Agreeableness": 0.25
+          },
+          "basis": "Hypothesis"
+        },
+        {
+          "id": "shelves",
+          "text": "Shelves for books and things you've collected",
+          "weights": {
+            "Openness": 0.5
+          },
+          "basis": "Gosling et al. 2002"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "You have one empty wall in your room. What goes on it?",
+          "options": {}
+        },
+        "25-44": {
+          "text": "You have one empty wall in your home. What goes on it?",
+          "options": {}
+        },
+        "45-64": {
+          "text": "You have one empty wall in your home. What goes on it?",
+          "options": {}
+        },
+        "65+": {
+          "text": "You have one empty wall in your living room. What goes on it?",
+          "options": {
+            "photos": "Photos of family and grandchildren or friends"
+          }
+        }
+      }
+    },
+    {
+      "id": "food",
+      "domain": "Food",
+      "touched_by_game": true,
+      "options": [
+        {
+          "id": "known",
+          "text": "Something I know and love",
+          "weights": {
+            "Openness": -0.5,
+            "Emotional Stability": -0.25
+          },
+          "basis": "Pliner & Hobden 1992"
+        },
+        {
+          "id": "new",
+          "text": "Something I've never tried: surprise me",
+          "weights": {
+            "Openness": 0.5
+          },
+          "basis": "Pliner & Hobden 1992"
+        },
+        {
+          "id": "healthy",
+          "text": "Something healthy and light",
+          "weights": {
+            "Conscientiousness": 0.5
+          },
+          "basis": "Keller & Siegrist 2015"
+        },
+        {
+          "id": "easy",
+          "text": "Whatever is easiest for you",
+          "weights": {
+            "Agreeableness": 0.25
+          },
+          "basis": "Hypothesis"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "A friend is cooking for you and asks what you'd like. You say:",
+          "options": {}
+        },
+        "25-44": {
+          "text": "A friend is cooking for you and asks what you'd like. You say:",
+          "options": {}
+        },
+        "45-64": {
+          "text": "A friend is cooking for you and asks what you'd like. You say:",
+          "options": {}
+        },
+        "65+": {
+          "text": "Your family is cooking Sunday lunch for you and asks what you'd like. You say:",
+          "options": {}
+        }
+      }
+    },
+    {
+      "id": "travel",
+      "domain": "Travel",
+      "touched_by_game": false,
+      "options": [
+        {
+          "id": "beach",
+          "text": "A beach resort to relax completely",
+          "weights": {
+            "Openness": -0.25
+          },
+          "basis": "Plog (travel personality)"
+        },
+        {
+          "id": "city",
+          "text": "A big city full of museums, food and evenings out",
+          "weights": {
+            "Openness": 0.5,
+            "Extraversion": 0.5
+          },
+          "basis": "Lee & Crompton 1992"
+        },
+        {
+          "id": "nature",
+          "text": "Nature, far from crowds",
+          "weights": {
+            "Openness": 0.25,
+            "Extraversion": -0.25
+          },
+          "basis": "Hypothesis"
+        },
+        {
+          "id": "familiar",
+          "text": "Back to a place you already know and love",
+          "weights": {
+            "Openness": -0.5
+          },
+          "basis": "Plog (travel personality)"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "You have one free week and a small budget. Where do you go?",
+          "options": {
+            "nature": "Hiking or camping in nature, far from crowds"
+          }
+        },
+        "25-44": {
+          "text": "You have one free week and a fixed budget. Where do you go?",
+          "options": {
+            "nature": "Hiking in nature, far from crowds"
+          }
+        },
+        "45-64": {
+          "text": "You have one free week and a fixed budget. Where do you go?",
+          "options": {
+            "nature": "Hiking in nature, far from crowds"
+          }
+        },
+        "65+": {
+          "text": "You have one free week and a fixed budget. Where do you go?",
+          "options": {
+            "nature": "A walking holiday in nature, far from crowds",
+            "city": "A big city full of museums, food, concerts and theatre"
+          }
+        }
+      }
+    },
+    {
+      "id": "music",
+      "domain": "Music",
+      "touched_by_game": false,
+      "options": [
+        {
+          "id": "hits",
+          "text": "Popular hits that everyone knows",
+          "weights": {
+            "Openness": -0.25,
+            "Conscientiousness": 0.25,
+            "Extraversion": 0.25,
+            "Agreeableness": 0.25
+          },
+          "basis": "Rentfrow & Gosling 2003"
+        },
+        {
+          "id": "rock",
+          "text": "Rock or something loud and intense",
+          "weights": {
+            "Openness": 0.25
+          },
+          "basis": "Rentfrow & Gosling 2003"
+        },
+        {
+          "id": "complex",
+          "text": "Jazz, classical or something calm and complex",
+          "weights": {
+            "Openness": 0.5
+          },
+          "basis": "Rentfrow & Gosling 2003"
+        },
+        {
+          "id": "beat",
+          "text": "Music with a strong beat you can move to",
+          "weights": {
+            "Extraversion": 0.5,
+            "Agreeableness": 0.25
+          },
+          "basis": "Rentfrow & Gosling 2003"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "A long drive, and you choose the music for the first hour. Which kind?",
+          "options": {
+            "beat": "Hip-hop, electronic or anything with a strong beat"
+          }
+        },
+        "25-44": {
+          "text": "A long drive, and you choose the music for the first hour. Which kind?",
+          "options": {
+            "beat": "Hip-hop, electronic or anything with a strong beat"
+          }
+        },
+        "45-64": {
+          "text": "A long drive, and you choose the music for the first hour. Which kind?",
+          "options": {
+            "beat": "Dance music, funk or anything with a strong beat"
+          }
+        },
+        "65+": {
+          "text": "A long drive, and you choose the music for the first hour. Which kind?",
+          "options": {
+            "hits": "The well-known hits you grew up with",
+            "beat": "Dance music or anything with a strong beat"
+          }
+        }
+      }
+    },
+    {
+      "id": "film",
+      "domain": "Film and books",
+      "touched_by_game": false,
+      "options": [
+        {
+          "id": "comedy",
+          "text": "A comedy or a feel-good story",
+          "weights": {
+            "Extraversion": 0.25,
+            "Agreeableness": 0.25
+          },
+          "basis": "Rentfrow, Goldberg & Zilca 2011"
+        },
+        {
+          "id": "thriller",
+          "text": "A thriller or an action film",
+          "weights": {
+            "Extraversion": 0.25
+          },
+          "basis": "Rentfrow, Goldberg & Zilca 2011"
+        },
+        {
+          "id": "documentary",
+          "text": "A documentary or a thoughtful drama",
+          "weights": {
+            "Openness": 0.5
+          },
+          "basis": "Rentfrow, Goldberg & Zilca 2011"
+        },
+        {
+          "id": "dark",
+          "text": "Horror or a dark crime story",
+          "weights": {
+            "Agreeableness": -0.25
+          },
+          "basis": "Rentfrow, Goldberg & Zilca 2011"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "Friday night, two free hours. Which film do you pick?",
+          "options": {}
+        },
+        "25-44": {
+          "text": "Friday night, two free hours. Which film do you pick?",
+          "options": {}
+        },
+        "45-64": {
+          "text": "Friday night, two free hours. Which film do you pick?",
+          "options": {}
+        },
+        "65+": {
+          "text": "A free evening. Which film or TV programme do you pick?",
+          "options": {}
+        }
+      }
+    },
+    {
+      "id": "cars",
+      "domain": "Cars",
+      "touched_by_game": false,
+      "options": [
+        {
+          "id": "reliable",
+          "text": "A reliable, practical car that never breaks down",
+          "weights": {
+            "Openness": -0.25,
+            "Conscientiousness": 0.25
+          },
+          "basis": "Hypothesis"
+        },
+        {
+          "id": "sporty",
+          "text": "A sporty car that's fun to drive",
+          "weights": {
+            "Extraversion": 0.25
+          },
+          "basis": "Zuckerman (sensation seeking)"
+        },
+        {
+          "id": "electric",
+          "text": "An electric car with the newest technology",
+          "weights": {
+            "Openness": 0.25
+          },
+          "basis": "Rogers (diffusion of innovations)"
+        },
+        {
+          "id": "big",
+          "text": "A big, comfortable car for friends and family",
+          "weights": {
+            "Agreeableness": 0.25
+          },
+          "basis": "Hypothesis"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "Imagine you can drive and get any car for free for a year. They all cost the same to run. Which one?",
+          "options": {
+            "big": "A big, comfortable car to take all your friends along"
+          }
+        },
+        "25-44": {
+          "text": "You can drive any car for free for a year. They all cost the same to run. Which one?",
+          "options": {}
+        },
+        "45-64": {
+          "text": "You can drive any car for free for a year. They all cost the same to run. Which one?",
+          "options": {}
+        },
+        "65+": {
+          "text": "You can drive any car for free for a year. They all cost the same to run. Which one?",
+          "options": {
+            "big": "A big, comfortable car for family and grandchildren"
+          }
+        }
+      }
+    },
+    {
+      "id": "tech",
+      "domain": "Tech",
+      "touched_by_game": true,
+      "options": [
+        {
+          "id": "first_day",
+          "text": "Try it on the first day",
+          "weights": {
+            "Openness": 0.5
+          },
+          "basis": "Rogers (diffusion of innovations)"
+        },
+        {
+          "id": "wait",
+          "text": "Wait until people I know use it",
+          "weights": {
+            "Agreeableness": 0.25
+          },
+          "basis": "Rogers (diffusion of innovations)"
+        },
+        {
+          "id": "data",
+          "text": "Check what it does with my data first",
+          "weights": {
+            "Conscientiousness": 0.25,
+            "Emotional Stability": -0.25
+          },
+          "basis": "Hypothesis"
+        },
+        {
+          "id": "ignore",
+          "text": "Ignore it: I have the apps I need",
+          "weights": {
+            "Openness": -0.5
+          },
+          "basis": "Rogers (diffusion of innovations)"
+        }
+      ],
+      "versions": {
+        "16-24": {
+          "text": "A new app appears that everyone at school or uni is talking about. What do you do?",
+          "options": {}
+        },
+        "25-44": {
+          "text": "A new app appears that everyone is talking about. What do you do?",
+          "options": {}
+        },
+        "45-64": {
+          "text": "A new app appears that everyone is talking about. What do you do?",
+          "options": {}
+        },
+        "65+": {
+          "text": "A new app appears that your family keeps talking about. What do you do?",
+          "options": {}
+        }
+      }
+    }
+  ]
+}
