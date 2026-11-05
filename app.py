@@ -293,7 +293,7 @@ elif state.step == "done":
             text_of = {option["id"]: option["text"] for option in q["options"]}
             guess = max(row["chances"], key=row["chances"].get)
             test_lines.append(
-                f"{q['domain']} ({q['text']}): ME's top guess '{text_of[guess]}' "
+                f"{q.get('domain', q['id'])} ({q['text']}): ME's top guess '{text_of[guess]}' "
                 f"({round(row['chances'][guess] * 100)}%); person chose '{text_of[row['pick']]}'; "
                 f"never-pick '{text_of[row['never']]}'"
             )
