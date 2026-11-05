@@ -53,6 +53,15 @@ def progress():
     return done / total
 
 
+def show_progress(chapter):
+    # Dileep's decision (5 Nov): the bar moves faster at the start and slower near the end
+    # (fast-to-slow, Villar et al. 2013), to keep players comfortable. The tree uses the same value.
+    shown = progress() ** 0.6
+    st.progress(shown)
+    st.caption(chapter)
+    brain_tree(shown)
+
+
 def next_scene(entry):
     # Save one answer and move on to the next scene (or to the twin questions).
     state.log.append(entry)
@@ -154,9 +163,8 @@ elif state.step == "scene":
                 state.shown_at = time.time()
             st.rerun()
 
-    brain_tree(progress(), "Chapter 1 of 3 · You in everyday life")
-    st.caption(f"Scene {state.scene_index + 1} of {len(state.scenes)}")
-    st.subheader(text)
+    show_progress("Chapter 1 of 3 · You in everyday life")
+    st.subheader(text, anchor=False)
 
     if not state.depending:
         for number, option in enumerate(options):
@@ -209,8 +217,8 @@ elif state.step == "twins":
         state.step = "scene"
         st.rerun()
 
-    brain_tree(progress(), "Chapter 1 of 3 · You in everyday life")
-    st.subheader("ME noticed something")
+    show_progress("Chapter 1 of 3 · You in everyday life")
+    st.subheader("ME noticed something", anchor=False)
     answers = []
     for clash in clashes:
         st.write(f"**{texts[clash['first']]}** You chose: *{choices[clash['first']]}*")
@@ -229,8 +237,8 @@ elif state.step == "twins":
             st.warning("Please answer each question.")
 
 elif state.step == "chapter2":
-    brain_tree(progress(), "Chapter 1 done")
-    st.subheader("Chapter 2 of 3 · Can ME guess you?")
+    show_progress("Chapter 1 done")
+    st.subheader("Chapter 2 of 3 · Can ME guess you?", anchor=False)
     st.write("ME has just made a secret guess for each of the next 8 questions, based on how you played. "
              "Answer honestly: you will see how well it guessed at the end.")
     if st.button("Let's see", type="primary"):
@@ -246,9 +254,8 @@ elif state.step == "test":
         state.q_index -= 1
         st.rerun()
 
-    brain_tree(progress(), "Chapter 2 of 3 · Can ME guess you?")
-    st.caption(f"Question {state.q_index + 1} of {len(state.questions)}: no right or wrong answers")
-    st.subheader(q["text"])
+    show_progress("Chapter 2 of 3 · Can ME guess you? No right or wrong answers")
+    st.subheader(q["text"], anchor=False)
     pick = st.radio("Your choice", texts, index=None, key=f"pick_{q['id']}")
     never = None
     if ask_never:
@@ -298,14 +305,16 @@ elif state.step == "done":
     never = sum(row["never_correct"] for row in asked)
     average = sum(row["chance_of_pick"] for row in rows) / n
 
-    brain_tree(1.0, "Chapter 3 of 3 · Your portrait")
-    st.subheader(f"Thanks, {state.name}! How well did ME know you?")
+    st.progress(1.0)
+    st.caption("Chapter 3 of 3 · Your portrait")
+    brain_tree(1.0)
+    st.subheader(f"Thanks, {state.name}! How well did ME know you?", anchor=False)
     st.write(f"**Top pick correct:** {top} of {n} (random guessing: 2 of 8)")
     st.write(f"**Your answer in ME's top two:** {two} of {n} (random: 4 of 8)")
     st.write(f"**Never-pick correct:** {never} of {len(asked)} (random: 1 of 4)")
     st.write(f"**Average chance ME gave your real answers:** {round(average * 100)}% (random: 25%)")
 
-    st.subheader("What ME learned from the game")
+    st.subheader("What ME learned from the game", anchor=False)
     for dimension, score in state.profile.items():
         st.write(f"**{dimension}:** {score} (from {state.evidence[dimension]} scenes)")
     for entry in state.log:
