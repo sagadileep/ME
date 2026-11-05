@@ -60,26 +60,16 @@ def depends_lines(game):
     return lines
 
 
-if __name__ == "__main__":
+def build_prompt(person, reader):
+    # Everything ME knows about one person, turned into a prompt for the AI.
+    # Returns None when ME has no results for that person.
     tipi_records = load_results()
     game_records = load_results(GAME_RESULTS_FILE)
-
-    person = input("Who should ME explain? ").strip().title()
-    reader = input("Who is reading this? ").strip().title()
-
     tipi = latest_for(tipi_records, person, answered_by=person)
     game = latest_for(game_records, person)
     views = others_views(tipi_records, person)
-
     if tipi is None and game is None and not views:
-        names = sorted({r["person"] for r in tipi_records} | {r["person"] for r in game_records})
-        print(f"No results found for {person}. Saved people: {', '.join(names)}")
-        raise SystemExit
-
-    consent = input(f"Has {person} agreed to send these answers to the AI? (y/n) ").strip().lower()
-    if consent != "y":
-        print("Okay, nothing was sent.")
-        raise SystemExit
+        return None
 
     if reader == person:
         perspective = f"{person} is reading this. Talk to them directly as 'you'."
@@ -146,5 +136,23 @@ Rules:
 Data about {person}:
 {data_text}
 """
+
+    return prompt
+
+
+if __name__ == "__main__":
+    person = input("Who should ME explain? ").strip().title()
+    reader = input("Who is reading this? ").strip().title()
+    prompt = build_prompt(person, reader)
+    if prompt is None:
+        records = load_results() + load_results(GAME_RESULTS_FILE)
+        names = sorted({r["person"] for r in records})
+        print(f"No results found for {person}. Saved people: {', '.join(names)}")
+        raise SystemExit
+
+    consent = input(f"Has {person} agreed to send these answers to the AI? (y/n) ").strip().lower()
+    if consent != "y":
+        print("Okay, nothing was sent.")
+        raise SystemExit
 
     print(ask_ai(prompt))
