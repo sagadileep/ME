@@ -345,8 +345,10 @@ elif state.step == "done":
             st.write(f"Checked ME's {len(state.test_rows)} guesses against your answers")
             st.write("Writing your portrait...")
             try:
+                started = time.time()
                 state.explanation = ask_ai(prompt)
-                status.update(label="Your portrait is ready", state="complete")
+                seconds = round(time.time() - started)
+                status.update(label=f"Your portrait is ready ({seconds} s)", state="complete")
             except Exception:
                 status.update(label="The AI is busy right now. Please try again in a minute.", state="error")
     if state.get("explanation"):
