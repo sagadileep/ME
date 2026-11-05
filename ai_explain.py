@@ -60,13 +60,15 @@ def depends_lines(game):
     return lines
 
 
-def build_prompt(person, reader):
+def build_prompt(person, reader, game=None, use_files=True):
     # Everything ME knows about one person, turned into a prompt for the AI.
+    # game: a game result to use directly; use_files=False reads no saved files (web demo).
     # Returns None when ME has no results for that person.
-    tipi_records = load_results()
-    game_records = load_results(GAME_RESULTS_FILE)
+    tipi_records = load_results() if use_files else []
+    game_records = load_results(GAME_RESULTS_FILE) if use_files else []
     tipi = latest_for(tipi_records, person, answered_by=person)
-    game = latest_for(game_records, person)
+    if game is None:
+        game = latest_for(game_records, person)
     views = others_views(tipi_records, person)
     if tipi is None and game is None and not views:
         return None

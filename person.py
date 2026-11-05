@@ -31,6 +31,13 @@ class Profile:
                 self.life_stage = game.get("life_stage")
                 self.depends = [entry for entry in game["log"] if "cases" in entry]
 
+    def use_game(self, game):
+        # Take the game result directly (for the web demo, where nothing is saved).
+        self.does = game["profile"]
+        self.evidence = game.get("evidence", {})
+        self.life_stage = game.get("life_stage")
+        self.depends = [entry for entry in game["log"] if "cases" in entry]
+
     def trait(self, name):
         # Best estimate: a weighted average of what they say and what they do.
         total = START * PRIOR_STRENGTH
@@ -76,4 +83,4 @@ if __name__ == "__main__":
         person = Profile(name)
         person.load()
         person.summary()
-        print()
+        print()

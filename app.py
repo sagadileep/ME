@@ -1,6 +1,7 @@
 # ME - web app (Streamlit)
 # The onboarding game in the browser. Reuses the game logic from game.py.
 
+import os
 import random
 import time
 from datetime import datetime
@@ -13,16 +14,21 @@ from ai import ask_ai
 from ai_explain import build_prompt
 from person import Profile
 from predict import load_test, question_for_age, predict
+from style import apply_style
 
 TEST_RESULTS_FILE = "test_results.json"
+
+# Online demo: set ME_DEMO = "1" in the hosting secrets. Then nothing is saved
+# and no saved results of other people are ever read.
+DEMO = os.environ.get("ME_DEMO") == "1"
+ACCESS_CODE = os.environ.get("ME_ACCESS_CODE")   # if set, players need this code
 
 AGE_GROUPS = ["16-24", "25-44", "45-64", "65+"]
 LIFE_STAGES = ["school", "studying", "working", "retired", "other"]
 REASONS = {reason: (case_a, case_b) for reason, case_a, case_b in DEPENDS_ON.values()}
 NO_REASON = "No, I just answered differently"
 
-st.title("ME")
-
+st.set_page_config(page_title="ME", layout="centered")
 # Session state: ME's memory between reruns
 state = st.session_state
 if "step" not in state:
@@ -30,6 +36,8 @@ if "step" not in state:
     state.scene_index = 0
     state.log = []
     state.depending = False
+
+apply_style(big_logo=(state.step == "start"))
 
 
 def next_scene(entry):
@@ -48,10 +56,10 @@ def finish_game(followups):
     state.profile, state.evidence = build_profile(state.log)
     explained = [f["second"] for f in followups if f["depends_on"]]
     state.warnings = sincerity_report(state.log, state.scenes, explained)
-    save_result({
+    state.game_record = {
         "person": state.name,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "source": "web",
+        "source": "demo" if DEMO else "web",
         "scenes_version": state.version,
         "age_group": state.age_group,
         "life_stage": state.life_stage,
@@ -60,10 +68,12 @@ def finish_game(followups):
         "log": state.log,
         "twin_followups": followups,
         "warnings": state.warnings,
-    }, GAME_RESULTS_FILE)
-
+    }
     person = Profile(state.name)
-    person.load()
+    if not DEMO:
+        save_result(state.game_record, GAME_RESULTS_FILE)
+        person.load()   # also brings in a questionnaire, if this person has one
+    person.use_game(state.game_record)
     state.test = load_test()
     state.questions = []
     for question in state.test["questions"]:
@@ -86,12 +96,18 @@ def finish_game(followups):
 
 if state.step == "start":
     st.write("A 5-minute game. There are no right answers: pick what you would really do.")
+    code = st.text_input("Access code", type="password") if ACCESS_CODE else None
     name = st.text_input("Your first name")
     age_group = st.radio("Your age", ["Under 16"] + AGE_GROUPS, index=None, horizontal=True)
     life_stage = st.radio("What are you mostly doing right now?", LIFE_STAGES, index=None, horizontal=True)
-    agree = st.checkbox("I agree that ME saves my answers on this laptop for testing.")
+    if DEMO:
+        agree = st.checkbox("I understand this is a demo: nothing I answer is saved.")
+    else:
+        agree = st.checkbox("I agree that ME saves my answers on this laptop for testing.")
     if st.button("Start"):
-        if age_group == "Under 16":
+        if ACCESS_CODE and code != ACCESS_CODE:
+            st.error("That access code is not right.")
+        elif age_group == "Under 16":
             st.error(f"Sorry, ME is for people aged {MIN_AGE} and over for now.")
         elif not (name and age_group and life_stage and agree):
             st.warning("Please fill in everything and tick the box.")
@@ -208,7 +224,7 @@ elif state.step == "test":
                 "chance_of_pick": round(chances[pick_id], 3),
             })
             state.q_index += 1
-            if state.q_index == len(state.questions):
+            if state.q_index == len(state.questions) and not DEMO:
                 save_result({
                     "person": state.name,
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -217,6 +233,7 @@ elif state.step == "test":
                     "age_group": state.age_group,
                     "rows": state.test_rows,
                 }, TEST_RESULTS_FILE)
+            if state.q_index == len(state.questions):
                 state.step = "done"
             st.rerun()
 
@@ -248,7 +265,7 @@ elif state.step == "done":
     st.write("Want ME to explain you in plain words? This sends your answers to an AI service (Google Gemini).")
     ai_ok = st.checkbox("Yes, send my answers to the AI")
     if st.button("Explain me", disabled=not ai_ok):
-        prompt = build_prompt(state.name, state.name)
+        prompt = build_prompt(state.name, state.name, game=state.game_record, use_files=not DEMO)
         with st.spinner("ME is thinking..."):
             try:
                 state.explanation = ask_ai(prompt)
