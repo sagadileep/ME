@@ -83,6 +83,7 @@ def finish_game(followups):
         random.shuffle(options)   # shown order changes; chances stay linked by option id
         state.questions.append({
             "id": question["id"],
+            "domain": question["domain"],
             "touched_by_game": question["touched_by_game"],
             "text": text,
             "options": options,
@@ -128,6 +129,16 @@ elif state.step == "scene":
         state[key] = (text, options)
         state.shown_at = time.time()
     text, options = state[key]
+
+    if state.scene_index > 0 or state.depending:
+        if st.button("← Back"):
+            if state.depending:
+                state.depending = False       # back from "It depends" to the options
+            else:
+                state.log.pop()               # forget the last answer
+                state.scene_index -= 1
+                state.shown_at = time.time()
+            st.rerun()
 
     st.caption(f"Scene {state.scene_index + 1} of {len(state.scenes)}")
     st.subheader(text)
@@ -176,6 +187,13 @@ elif state.step == "twins":
     choices = {entry["scene"]: entry["choice"] for entry in state.log}
     texts = {s["id"]: for_life_stage(s, state.life_stage)[0] for s in state.scenes}
 
+    if st.button("← Back"):
+        state.log.pop()
+        state.scene_index = len(state.scenes) - 1
+        state.shown_at = time.time()
+        state.step = "scene"
+        st.rerun()
+
     st.subheader("ME noticed something")
     answers = []
     for clash in clashes:
@@ -197,6 +215,11 @@ elif state.step == "twins":
 elif state.step == "test":
     q = state.questions[state.q_index]
     texts = [option["text"] for option in q["options"]]
+    if state.q_index > 0 and st.button("← Back"):
+        state.test_rows.pop()
+        state.q_index -= 1
+        st.rerun()
+
     st.caption(f"Question {state.q_index + 1} of {len(state.questions)}: no right or wrong answers")
     st.subheader(q["text"])
     pick = st.radio("Your choice", texts, index=None, key=f"pick_{q['id']}")
@@ -265,7 +288,17 @@ elif state.step == "done":
     st.write("Want ME to explain you in plain words? This sends your answers to an AI service (Google Gemini).")
     ai_ok = st.checkbox("Yes, send my answers to the AI")
     if st.button("Explain me", disabled=not ai_ok):
-        prompt = build_prompt(state.name, state.name, game=state.game_record, use_files=not DEMO)
+        test_lines = []
+        for q, row in zip(state.questions, state.test_rows):
+            text_of = {option["id"]: option["text"] for option in q["options"]}
+            guess = max(row["chances"], key=row["chances"].get)
+            test_lines.append(
+                f"{q['domain']} ({q['text']}): ME's top guess '{text_of[guess]}' "
+                f"({round(row['chances'][guess] * 100)}%); person chose '{text_of[row['pick']]}'; "
+                f"never-pick '{text_of[row['never']]}'"
+            )
+        prompt = build_prompt(state.name, state.name, game=state.game_record,
+                              use_files=not DEMO, test_lines=test_lines)
         with st.spinner("ME is thinking..."):
             try:
                 state.explanation = ask_ai(prompt)

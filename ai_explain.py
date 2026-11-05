@@ -60,9 +60,22 @@ def depends_lines(game):
     return lines
 
 
-def build_prompt(person, reader, game=None, use_files=True):
+# Which game measures belong to which part of the person
+DECISION_STYLE = ["Maximizing", "Intuitive", "Relies on others"]
+VALUES = ["Security", "Stimulation", "Benevolence", "Achievement"]
+TASTE = ["Minimal vs expressive", "Classic vs trendy", "Dark vs bright", "Warm vs cool", "Natural vs polished"]
+
+
+def pick(profile, evidence, names):
+    # The scores for some dimensions, each with how many scenes it rests on.
+    return {name: f"{round(profile[name], 1)} (from {evidence.get(name, 1)} scenes)"
+            for name in names if name in profile}
+
+
+def build_prompt(person, reader, game=None, use_files=True, test_lines=None):
     # Everything ME knows about one person, turned into a prompt for the AI.
     # game: a game result to use directly; use_files=False reads no saved files (web demo).
+    # test_lines: what ME predicted in the prediction test and what the person chose.
     # Returns None when ME has no results for that person.
     tipi_records = load_results() if use_files else []
     game_records = load_results(GAME_RESULTS_FILE) if use_files else []
@@ -89,10 +102,12 @@ def build_prompt(person, reader, game=None, use_files=True):
     else:
         data.append(f"No questionnaire from {person} themselves yet.")
     if game:
-        game_traits = {t: round(game["profile"][t], 1) for t in TRAITS if t in game["profile"]}
-        data.append(f"What {person} DOES (game choices, {game['date']}): {game_traits}")
-        other = {k: round(v, 1) for k, v in game["profile"].items() if k not in TRAITS}
-        data.append(f"Other things the game measured: {other}")
+        profile = game["profile"]
+        evidence = game.get("evidence", {})
+        data.append(f"What {person} DOES (game choices, {game['date']}): {pick(profile, evidence, TRAITS)}")
+        data.append(f"Decision style (1-7): {pick(profile, evidence, DECISION_STYLE) or 'not measured'}")
+        data.append(f"Values (1-7, from what they would do with money): {pick(profile, evidence, VALUES) or 'not measured'}")
+        data.append(f"Taste (1-7, low = first word, high = second word): {pick(profile, evidence, TASTE) or 'not measured'}")
         for line in depends_lines(game):
             data.append(line)
         if game["warnings"]:
@@ -104,6 +119,9 @@ def build_prompt(person, reader, game=None, use_files=True):
         data.append(f"Biggest differences between words and choices: {gaps if gaps else 'none'}")
     for friend, scores in views.items():
         data.append(f"How {friend} sees {person}: {scores}")
+    if test_lines:
+        data.append("Prediction test (ME guessed before the person answered):")
+        data.extend(test_lines)
     data_text = "\n".join(data)
 
     prompt = f"""
@@ -112,28 +130,38 @@ Explain this person in warm, simple English that a non-native speaker can easily
 
 {perspective}
 
+Write a personal portrait with these short sections, each with a small heading.
+Skip a section when there is no data for it.
+
+1. Who you are: 2-3 sentences that connect the personality traits the way a
+   close friend would describe someone, then one short plain line per Big Five
+   trait.
+2. How you decide: from the decision style scores.
+3. What matters to you: from the values scores.
+4. Your taste: from the taste scores (for example warm and natural, or dark and polished).
+5. It depends: their "it depends" answers and explanations, as real examples of
+   how they change with mood, people, money or time.
+6. What ME guessed about you: from the prediction test. Say where ME was right,
+   where it was wrong, and a likely reason for a miss (often mood or situation).
+   Be honest that ME is still learning.
+7. End with ONE question about the biggest difference between words and choices,
+   or about what ME is least sure of.
+
 Rules:
-- Start with 2 sentences that describe the whole person, connecting the traits
-  together, the way a close friend would describe them.
-- Then one short line per Big Five trait, in plain everyday words.
 - Scores go from 1 to 7, and 4 is the middle. Treat 3.5 to 4.5 as
   "in between / a bit of both", not as high or low.
+- A score that rests on only 1 scene is a first guess: say so with words like
+  "maybe" or "it seems". Do not present it as a fact.
 - Emotional Stability: high means calm and resilient.
 - The questionnaire is what the person SAYS about themselves. The game is what
-  they actually CHOSE in everyday scenes. The game has only about 10 scenes,
-  so it is a rougher measure.
+  they actually CHOSE in everyday scenes.
 - Where words and choices differ a lot, mention it gently and with curiosity,
   like a friend who noticed something. Never call the person a liar or wrong.
-  Suggest that it may depend on the situation.
-- Use the person's "it depends" answers as real examples (for example: open to
-  new food in a good mood, the familiar dish when tired).
 - If friends' views are given, you may mention how others see the person.
-- Where confidence is medium or low, or there are sincerity warnings, sound
-  clearly less certain.
+- Where confidence is low or there are sincerity warnings, sound clearly less certain.
 - Never diagnose anything or mention mental illness.
-- Maximum 220 words.
-- End with ONE question about the biggest difference between words and choices
-  (or, if there is none, about the trait you are least certain about).
+- Warm, simple English that a non-native speaker can easily understand.
+- Maximum 380 words.
 
 Data about {person}:
 {data_text}
