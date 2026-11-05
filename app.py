@@ -14,7 +14,7 @@ from ai import ask_ai
 from ai_explain import build_prompt
 from person import Profile
 from predict import load_test, question_for_age, predict
-from style import apply_style
+from style import apply_style, brain_tree
 
 TEST_RESULTS_FILE = "test_results.json"
 
@@ -22,6 +22,9 @@ TEST_RESULTS_FILE = "test_results.json"
 # and no saved results of other people are ever read.
 DEMO = os.environ.get("ME_DEMO") == "1"
 ACCESS_CODE = os.environ.get("ME_ACCESS_CODE")   # if set, players need this code
+
+START_STEPS = 3      # name, age and life stage count as real steps of the journey
+TEST_QUESTIONS = 8
 
 AGE_GROUPS = ["16-24", "25-44", "45-64", "65+"]
 LIFE_STAGES = ["school", "studying", "working", "retired", "other"]
@@ -38,6 +41,16 @@ if "step" not in state:
     state.depending = False
 
 apply_style(big_logo=(state.step == "start"))
+
+
+def progress():
+    # The real share of the journey that is done: start + scenes + twin check + test.
+    total = START_STEPS + len(state.scenes) + 1 + TEST_QUESTIONS
+    done = START_STEPS + len(state.log)
+    if state.step in ("chapter2", "test", "done"):
+        done += 1
+    done += state.get("q_index", 0)
+    return done / total
 
 
 def next_scene(entry):
@@ -91,12 +104,13 @@ def finish_game(followups):
         })
     state.q_index = 0
     state.test_rows = []
-    state.step = "test"
+    state.step = "chapter2"
     st.rerun()
 
 
 if state.step == "start":
-    st.write("A 5-minute game. There are no right answers: pick what you would really do.")
+    st.write("**A 5-minute game in 3 short chapters.** There are no right answers: pick what you would really do.")
+    st.write("At the end, see how well ME guessed you.")
     code = st.text_input("Access code", type="password") if ACCESS_CODE else None
     name = st.text_input("Your first name")
     age_group = st.radio("Your age", ["Under 16"] + AGE_GROUPS, index=None, horizontal=True)
@@ -140,6 +154,7 @@ elif state.step == "scene":
                 state.shown_at = time.time()
             st.rerun()
 
+    brain_tree(progress(), "Chapter 1 of 3 · You in everyday life")
     st.caption(f"Scene {state.scene_index + 1} of {len(state.scenes)}")
     st.subheader(text)
 
@@ -194,6 +209,7 @@ elif state.step == "twins":
         state.step = "scene"
         st.rerun()
 
+    brain_tree(progress(), "Chapter 1 of 3 · You in everyday life")
     st.subheader("ME noticed something")
     answers = []
     for clash in clashes:
@@ -212,27 +228,40 @@ elif state.step == "twins":
         else:
             st.warning("Please answer each question.")
 
+elif state.step == "chapter2":
+    brain_tree(progress(), "Chapter 1 done")
+    st.subheader("Chapter 2 of 3 · Can ME guess you?")
+    st.write("ME has just made a secret guess for each of the next 8 questions, based on how you played. "
+             "Answer honestly: you will see how well it guessed at the end.")
+    if st.button("Let's see", type="primary"):
+        state.step = "test"
+        st.rerun()
+
 elif state.step == "test":
     q = state.questions[state.q_index]
+    ask_never = state.q_index % 2 == 0   # never-pick on 4 of the 8 questions
     texts = [option["text"] for option in q["options"]]
     if state.q_index > 0 and st.button("← Back"):
         state.test_rows.pop()
         state.q_index -= 1
         st.rerun()
 
+    brain_tree(progress(), "Chapter 2 of 3 · Can ME guess you?")
     st.caption(f"Question {state.q_index + 1} of {len(state.questions)}: no right or wrong answers")
     st.subheader(q["text"])
     pick = st.radio("Your choice", texts, index=None, key=f"pick_{q['id']}")
-    never = st.radio("Which would you NEVER pick?", texts, index=None, key=f"never_{q['id']}")
+    never = None
+    if ask_never:
+        never = st.radio("Which would you NEVER pick?", texts, index=None, key=f"never_{q['id']}")
     if st.button("Next"):
-        if not (pick and never):
-            st.warning("Please answer both.")
-        elif pick == never:
+        if not pick or (ask_never and not never):
+            st.warning("Please answer before going on.")
+        elif ask_never and pick == never:
             st.warning("Your choice and your never-pick must be different.")
         else:
             ids = [option["id"] for option in q["options"]]
             pick_id = ids[texts.index(pick)]
-            never_id = ids[texts.index(never)]
+            never_id = ids[texts.index(never)] if never else None
             chances = q["chances"]
             order = sorted(chances, key=chances.get, reverse=True)   # most likely first
             state.test_rows.append({
@@ -243,7 +272,7 @@ elif state.step == "test":
                 "never": never_id,
                 "top_correct": pick_id == order[0],
                 "in_top_two": pick_id in order[:2],
-                "never_correct": never_id == order[-1],
+                "never_correct": never_id == order[-1] if never_id else None,
                 "chance_of_pick": round(chances[pick_id], 3),
             })
             state.q_index += 1
@@ -265,13 +294,15 @@ elif state.step == "done":
     n = len(rows)
     top = sum(row["top_correct"] for row in rows)
     two = sum(row["in_top_two"] for row in rows)
-    never = sum(row["never_correct"] for row in rows)
+    asked = [row for row in rows if row["never"]]
+    never = sum(row["never_correct"] for row in asked)
     average = sum(row["chance_of_pick"] for row in rows) / n
 
+    brain_tree(1.0, "Chapter 3 of 3 · Your portrait")
     st.subheader(f"Thanks, {state.name}! How well did ME know you?")
     st.write(f"**Top pick correct:** {top} of {n} (random guessing: 2 of 8)")
     st.write(f"**Your answer in ME's top two:** {two} of {n} (random: 4 of 8)")
-    st.write(f"**Never-pick correct:** {never} of {n} (random: 2 of 8)")
+    st.write(f"**Never-pick correct:** {never} of {len(asked)} (random: 1 of 4)")
     st.write(f"**Average chance ME gave your real answers:** {round(average * 100)}% (random: 25%)")
 
     st.subheader("What ME learned from the game")
@@ -294,15 +325,20 @@ elif state.step == "done":
             guess = max(row["chances"], key=row["chances"].get)
             test_lines.append(
                 f"{q.get('domain', q['id'])} ({q['text']}): ME's top guess '{text_of[guess]}' "
-                f"({round(row['chances'][guess] * 100)}%); person chose '{text_of[row['pick']]}'; "
-                f"never-pick '{text_of[row['never']]}'"
+                f"({round(row['chances'][guess] * 100)}%); person chose '{text_of[row['pick']]}'"
+                + (f"; never-pick '{text_of[row['never']]}'" if row["never"] else "")
             )
         prompt = build_prompt(state.name, state.name, game=state.game_record,
                               use_files=not DEMO, test_lines=test_lines)
-        with st.spinner("ME is thinking..."):
+        with st.status("ME is writing your portrait...") as status:
+            st.write(f"Read your {len(state.log)} choices in the game")
+            st.write("Compared what you said with what you chose")
+            st.write(f"Checked ME's {len(state.test_rows)} guesses against your answers")
+            st.write("Writing your portrait...")
             try:
                 state.explanation = ask_ai(prompt)
+                status.update(label="Your portrait is ready", state="complete")
             except Exception:
-                st.error("The AI is busy right now. Please try again in a minute.")
+                status.update(label="The AI is busy right now. Please try again in a minute.", state="error")
     if state.get("explanation"):
         st.markdown(state.explanation)
