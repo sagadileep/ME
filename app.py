@@ -15,13 +15,21 @@ from ai_explain import build_prompt
 from person import Profile
 from predict import load_test, question_for_age, predict
 from style import apply_style, brain_tree
+from db import new_player_code, save_play
 
 TEST_RESULTS_FILE = "test_results.json"
 
-# Online demo: set ME_DEMO = "1" in the hosting secrets. Then nothing is saved
-# and no saved results of other people are ever read.
-DEMO = os.environ.get("ME_DEMO") == "1"
+# Where answers go, set with ME_MODE in the hosting secrets:
+#   local = files on this laptop (default) · demo = nothing saved · study = anonymous EU database
+MODE = os.environ.get("ME_MODE", "demo" if os.environ.get("ME_DEMO") == "1" else "local")
+DEMO = MODE == "demo"
+STUDY = MODE == "study"
+LOCAL = MODE == "local"
 ACCESS_CODE = os.environ.get("ME_ACCESS_CODE")   # if set, players need this code
+CONTACT = os.environ.get("ME_CONTACT", "the person who sent you this link")
+KEEP_UNTIL = "31 March 2027"
+FEEDBACK_FILE = "feedback.json"
+FEELINGS = ["Too long", "OK", "Quick"]
 
 START_STEPS = 3      # name, age and life stage count as real steps of the journey
 TEST_QUESTIONS = 8
@@ -67,6 +75,8 @@ def next_scene(entry):
     state.log.append(entry)
     state.depending = False
     state.scene_index += 1
+    if STUDY:
+        save_play({"code": state.code, "status": "playing", "last_step": entry["scene"]})
     if state.scene_index == len(state.scenes):
         state.step = "twins"
     st.rerun()
@@ -81,7 +91,7 @@ def finish_game(followups):
     state.game_record = {
         "person": state.name,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "source": "demo" if DEMO else "web",
+        "source": MODE,
         "scenes_version": state.version,
         "age_group": state.age_group,
         "life_stage": state.life_stage,
@@ -92,9 +102,12 @@ def finish_game(followups):
         "warnings": state.warnings,
     }
     person = Profile(state.name)
-    if not DEMO:
+    if LOCAL:
         save_result(state.game_record, GAME_RESULTS_FILE)
         person.load()   # also brings in a questionnaire, if this person has one
+    if STUDY:
+        game = {key: value for key, value in state.game_record.items() if key != "person"}   # no name
+        save_play({"code": state.code, "status": "game_done", "last_step": "game_done", "game": game})
     person.use_game(state.game_record)
     state.test = load_test()
     state.questions = []
@@ -126,6 +139,18 @@ if state.step == "start":
     life_stage = st.radio("What are you mostly doing right now?", LIFE_STAGES, index=None, horizontal=True)
     if DEMO:
         agree = st.checkbox("I understand this is a demo: nothing I answer is saved.")
+    elif STUDY:
+        with st.expander("What is saved, and why"):
+            st.write(f"""
+- **Why:** to test and improve how well ME understands people.
+- **What:** your age group, what you mostly do, your choices in the game, how long each choice took,
+  where you stopped if you stop early, ME's guesses, your answers to the 8 questions and your feedback.
+- **Not saved:** your name. You get a random player code instead.
+- **Where:** a secure database in the EU (Frankfurt). Only the project team can see it.
+- **How long:** until {KEEP_UNTIL}, then it is deleted.
+- **Your choice:** taking part is voluntary. To have your answers deleted, send your player code to {CONTACT}.
+""")
+        agree = st.checkbox("I agree that my answers are saved anonymously for this study.")
     else:
         agree = st.checkbox("I agree that ME saves my answers on this laptop for testing.")
     if st.button("Start"):
@@ -140,6 +165,11 @@ if state.step == "start":
             state.age_group = age_group
             state.life_stage = life_stage
             state.scenes, state.version = load_scenes()
+            if STUDY:
+                state.code = new_player_code()
+                save_play({"code": state.code, "status": "started", "last_step": "start",
+                           "age_group": state.age_group, "life_stage": state.life_stage,
+                           "scenes_version": state.version})
             state.step = "scene"
             st.rerun()
 
@@ -283,7 +313,10 @@ elif state.step == "test":
                 "chance_of_pick": round(chances[pick_id], 3),
             })
             state.q_index += 1
-            if state.q_index == len(state.questions) and not DEMO:
+            if state.q_index == len(state.questions) and STUDY:
+                save_play({"code": state.code, "status": "test_done", "last_step": "test_done",
+                           "test_version": state.test["version"], "test": state.test_rows})
+            if state.q_index == len(state.questions) and LOCAL:
                 save_result({
                     "person": state.name,
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -325,6 +358,26 @@ elif state.step == "done":
         st.info("ME is not fully confident in these answers yet: " + "; ".join(state.warnings))
 
     st.divider()
+    st.write("**One last tap: how long did that feel?**")
+    feeling = st.radio("How long did that feel?", FEELINGS, index=None, horizontal=True,
+                       label_visibility="collapsed")
+    comment = st.text_input("Anything we should change? (optional)")
+    if st.button("Send feedback", disabled=feeling is None or state.get("feedback_sent", False)):
+        if STUDY:
+            save_play({"code": state.code, "status": "complete", "last_step": "feedback",
+                       "feedback": feeling, "comment": comment})
+        elif LOCAL:
+            save_result({"person": state.name, "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                         "feeling": feeling, "comment": comment}, FEEDBACK_FILE)
+        state.feedback_sent = True
+        st.rerun()
+    if state.get("feedback_sent"):
+        st.success("Thank you!")
+    if STUDY:
+        st.info(f"Your player code: **{state.code}**. Keep it: send it to {CONTACT} "
+                "if you want your answers deleted.")
+
+    st.divider()
     st.write("Want ME to explain you in plain words? This sends your answers to an AI service (Google Gemini).")
     ai_ok = st.checkbox("Yes, send my answers to the AI")
     if st.button("Explain me", disabled=not ai_ok):
@@ -338,7 +391,7 @@ elif state.step == "done":
                 + (f"; never-pick '{text_of[row['never']]}'" if row["never"] else "")
             )
         prompt = build_prompt(state.name, state.name, game=state.game_record,
-                              use_files=not DEMO, test_lines=test_lines)
+                              use_files=LOCAL, test_lines=test_lines)
         with st.status("ME is writing your portrait...") as status:
             st.write(f"Read your {len(state.log)} choices in the game")
             st.write("Compared what you said with what you chose")
