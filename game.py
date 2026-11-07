@@ -22,7 +22,8 @@ DEPENDS_ON = {
 }
 
 # Life stage: used ONLY to choose a scene's wording, never to predict personality.
-LIFE_STAGES = {"1": "school", "2": "studying", "3": "working", "4": "retired", "5": "other"}
+LIFE_STAGES = {"1": "school", "2": "studying", "3": "working", "4": "retired",
+               "5": "home and family", "6": "other"}
 MIN_AGE = 16   # under 16 needs a parent's consent (GDPR Art. 8); teen version later
 def load_scenes():
     with open(SCENES_FILE, "r", encoding="utf-8") as f:
@@ -49,8 +50,8 @@ def average_effects(effect_list):
 
 def ask_life_stage():
     print("What are you mostly doing right now?")
-    print("  1. School   2. Studying   3. Working   4. Retired   5. Other")
-    key = ask_number("Your answer (1-5): ", list(LIFE_STAGES))
+    print("  1. School   2. Studying   3. Working   4. Retired   5. Home and family   6. Other")
+    key = ask_number("Your answer (1-6): ", list(LIFE_STAGES))
     return LIFE_STAGES[key]
 
 

@@ -1,7 +1,7 @@
 {
-  "version": "v5-draft",
-  "date": "2026-10-31",
-  "note": "Draft scene bank. Options turn public-domain IPIP behaviours (Goldberg) into choices; situations span the Situational Eight DIAMONDS (Rauthmann et al. 2014). Effect values are first guesses on the 1-7 scale, to be calibrated against TIPI results. v2: restaurant option 4 now measures spending on experience; two twin scenes (twin_of) re-measure Extraversion and Openness in a new situation, for the sincerity check. v3: restaurant gets a 5th option, the restaurant's special (trusted novelty). v4: 'ask the waiter' and 'look it up first' are careful, not open (Openness 0); new duty scene for the dependable side of Conscientiousness (Lokesh test, 26 Oct). v5: life-stage wording (variants). A variant changes only the words; target, options order and effects stay the same, so results stay comparable. Life stage is never used to predict personality.",
+  "version": "v6-draft",
+  "date": "2026-11-07",
+  "note": "Draft scene bank. Options turn public-domain IPIP behaviours (Goldberg) into choices; situations span the Situational Eight DIAMONDS (Rauthmann et al. 2014). Effect values are first guesses on the 1-7 scale, to be calibrated against TIPI results. v2: restaurant option 4 now measures spending on experience; two twin scenes (twin_of) re-measure Extraversion and Openness in a new situation, for the sincerity check. v3: restaurant gets a 5th option, the restaurant's special (trusted novelty). v4: 'ask the waiter' and 'look it up first' are careful, not open (Openness 0); new duty scene for the dependable side of Conscientiousness (Lokesh test, 26 Oct). v5: life-stage wording (variants). A variant changes only the words; target, options order and effects stay the same, so results stay comparable. Life stage is never used to predict personality. v6: life stage 'home and family' (people caring for home and family) with its own wording; options and effects unchanged.",
   "scenes": [
     {
       "id": "restaurant",
@@ -85,6 +85,15 @@
             "Finish jobs at home first, then relax",
             "Decide each morning what to do",
             "Go along with whatever friends or family suggest"
+          ]
+        },
+        "home and family": {
+          "text": "Your family is away for the weekend, and you have two free days.",
+          "options": [
+            "Write a plan for the two days",
+            "Finish jobs at home first, then relax",
+            "Decide each morning what to do",
+            "Go with whatever friends suggest"
           ]
         }
       }
@@ -170,6 +179,9 @@
         },
         "retired": {
           "text": "A friend proudly shows you something they made, like a painting or a dish. Honestly, you think it's weak."
+        },
+        "home and family": {
+          "text": "A friend proudly shows you something they made, like a dish or a dress. Honestly, you think it's weak."
         }
       }
     },
@@ -217,6 +229,15 @@
           ]
         },
         "retired": {
+          "text": "You promised your neighbour you'd help tomorrow morning. Tonight you feel tired and want to sleep in.",
+          "options": [
+            "Go and help as promised",
+            "Help for a short while, then say you need rest",
+            "Tell them tonight it has to be another day",
+            "Don't go, and wait to see if they mention it"
+          ]
+        },
+        "home and family": {
           "text": "You promised your neighbour you'd help tomorrow morning. Tonight you feel tired and want to sleep in.",
           "options": [
             "Go and help as promised",
@@ -350,6 +371,9 @@
         },
         "retired": {
           "text": "You're redecorating your living room. Which one feels like you?"
+        },
+        "home and family": {
+          "text": "You're redecorating your living room. Which one feels like you?"
         }
       }
     },
@@ -459,6 +483,7 @@
     "studying",
     "working",
     "retired",
+    "home and family",
     "other"
   ]
 }

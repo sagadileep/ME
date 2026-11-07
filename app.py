@@ -36,7 +36,7 @@ START_STEPS = 3      # name, age and life stage count as real steps of the journ
 TEST_QUESTIONS = 8
 
 AGE_GROUPS = ["16-24", "25-44", "45-64", "65+"]
-LIFE_STAGES = ["school", "studying", "working", "retired", "other"]
+LIFE_STAGES = ["school", "studying", "working", "retired", "home and family", "other"]
 REASONS = {reason: (case_a, case_b) for reason, case_a, case_b in DEPENDS_ON.values()}
 NO_REASON = "No, I just answered differently"
 
