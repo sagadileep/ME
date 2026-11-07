@@ -15,6 +15,7 @@ from ai_explain import build_prompt
 from person import Profile
 from predict import load_test, question_for_age, predict
 from style import apply_style, brain_tree
+import db
 from db import new_player_code, save_play
 
 TEST_RESULTS_FILE = "test_results.json"
@@ -49,6 +50,10 @@ if "step" not in state:
     state.depending = False
 
 apply_style(big_logo=(state.step == "start"))
+
+if STUDY and db.last_error:
+    # Visible only while something is wrong, so problems are noticed straight away.
+    st.error(f"Saving to the study database failed: {db.last_error}")
 
 
 def progress():
