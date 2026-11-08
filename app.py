@@ -30,6 +30,7 @@ ACCESS_CODE = os.environ.get("ME_ACCESS_CODE")   # if set, players need this cod
 CONTACT = os.environ.get("ME_CONTACT", "the person who sent you this link")
 KEEP_UNTIL = "31 March 2027"
 FEEDBACK_FILE = "feedback.json"
+SURVEYCIRCLE_CODE = os.environ.get("ME_SURVEYCIRCLE_CODE")   # set in the secrets; shown at the end
 FEELINGS = ["Too long", "OK", "Quick"]
 
 START_STEPS = 3      # name, age and life stage count as real steps of the journey
@@ -138,6 +139,9 @@ def finish_game(followups):
 if state.step == "start":
     st.write("**A 5-minute game in 3 short chapters.** There are no right answers: pick what you would really do.")
     st.write("At the end, see how well ME guessed you.")
+    if SURVEYCIRCLE_CODE:
+        st.caption("PS: SurveyCircle users receive points for their participation, which can be used "
+                   "to recruit free survey participants at SurveyCircle.com")
     code = st.text_input("Access code", type="password") if ACCESS_CODE else None
     name = st.text_input("Your first name")
     age_group = st.radio("Your age", ["Under 16"] + AGE_GROUPS, index=None, horizontal=True)
@@ -346,6 +350,10 @@ elif state.step == "done":
     st.progress(1.0)
     st.caption("Chapter 3 of 3 · Your portrait")
     brain_tree(1.0)
+    if SURVEYCIRCLE_CODE:
+        st.info(f"Redeem the following Survey Code at https://www.surveycircle.com and get free survey "
+                f"participants through SurveyCircle. The Survey Code is: **{SURVEYCIRCLE_CODE}**\n\n"
+                f"Redeem Survey Code with one click: https://www.surveycircle.com/{SURVEYCIRCLE_CODE}/")
     st.subheader(f"Thanks, {state.name}! How well did ME know you?", anchor=False)
     st.write(f"**Top pick correct:** {top} of {n} (random guessing: 2 of 8)")
     st.write(f"**Your answer in ME's top two:** {two} of {n} (random: 4 of 8)")
