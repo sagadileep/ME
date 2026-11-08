@@ -141,9 +141,13 @@ Skip a section when there is no data for it.
 4. Your taste: from the taste scores (for example warm and natural, or dark and polished).
 5. It depends: their "it depends" answers and explanations, as real examples of
    how they change with mood, people, money or time.
-6. What ME guessed about you: from the prediction test. Say where ME was right,
-   where it was wrong, and a likely reason for a miss (often mood or situation).
-   Be honest that ME is still learning.
+6. What ME guessed about you: from the prediction test. For each guess, explain
+   WHY ME expected it, using only the "why" given in the data (option -> value ->
+   trait -> evidence from their game). Never invent a different reason. If the data
+   says "no strong reason yet", say ME was mostly guessing. Where ME was wrong, use
+   the value of the option the person actually chose to say gently what may matter
+   more to them. Pick the 3-4 most telling questions, not all 8. Be honest that ME
+   is still learning.
 7. End with ONE question about the biggest difference between words and choices,
    or about what ME is least sure of.
 
@@ -161,7 +165,7 @@ Rules:
 - Where confidence is low or there are sincerity warnings, sound clearly less certain.
 - Never diagnose anything or mention mental illness.
 - Warm, simple English that a non-native speaker can easily understand.
-- Maximum 380 words.
+- Maximum 420 words.
 
 Data about {person}:
 {data_text}

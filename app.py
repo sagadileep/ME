@@ -13,7 +13,7 @@ from storage import save_result
 from ai import ask_ai
 from ai_explain import build_prompt
 from person import Profile
-from predict import load_test, question_for_age, predict
+from predict import load_test, question_for_age, predict, why_chain, why_text
 from style import apply_style, brain_tree
 import db
 from db import new_player_code, save_play
@@ -121,6 +121,8 @@ def finish_game(followups):
         text, options = question_for_age(question, state.age_group)
         chances = predict(person, options, state.test["strength"])
         by_id = {option["id"]: chance for option, chance in zip(options, chances)}
+        top = max(options, key=lambda option: by_id[option["id"]])
+        why = why_text(top, why_chain(person, top, state.test["strength"]))   # hidden until the portrait
         random.shuffle(options)   # shown order changes; chances stay linked by option id
         state.questions.append({
             "id": question["id"],
@@ -129,6 +131,7 @@ def finish_game(followups):
             "text": text,
             "options": options,
             "chances": by_id,
+            "why": why,
         })
     state.q_index = 0
     state.test_rows = []
@@ -398,9 +401,13 @@ elif state.step == "done":
         for q, row in zip(state.questions, state.test_rows):
             text_of = {option["id"]: option["text"] for option in q["options"]}
             guess = max(row["chances"], key=row["chances"].get)
+            ladder_of = {option["id"]: option.get("ladder") or {} for option in q["options"]}
+            picked = ladder_of[row["pick"]]
             test_lines.append(
                 f"{q.get('domain', q['id'])} ({q['text']}): ME's top guess '{text_of[guess]}' "
-                f"({round(row['chances'][guess] * 100)}%); person chose '{text_of[row['pick']]}'"
+                f"({round(row['chances'][guess] * 100)}%), why: {q.get('why', 'not recorded')}. "
+                f"Person chose '{text_of[row['pick']]}' (this option {picked.get('consequence', '?')}; "
+                f"value: {picked.get('value', '?')})"
                 + (f"; never-pick '{text_of[row['never']]}'" if row["never"] else "")
             )
         prompt = build_prompt(state.name, state.name, game=state.game_record,

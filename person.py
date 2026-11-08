@@ -18,6 +18,7 @@ class Profile:
         self.does = {}          # game scores
         self.evidence = {}      # how many scenes each game score is built on
         self.depends = []       # the person's "it depends" answers
+        self.log = []           # every game answer, used as evidence for the Why Chain
         self.life_stage = None
 
     def load(self):
@@ -30,6 +31,7 @@ class Profile:
                 self.evidence = game.get("evidence", {})
                 self.life_stage = game.get("life_stage")
                 self.depends = [entry for entry in game["log"] if "cases" in entry]
+                self.log = game["log"]
 
     def use_game(self, game):
         # Take the game result directly (for the web demo, where nothing is saved).
@@ -37,6 +39,7 @@ class Profile:
         self.evidence = game.get("evidence", {})
         self.life_stage = game.get("life_stage")
         self.depends = [entry for entry in game["log"] if "cases" in entry]
+        self.log = game["log"]
 
     def trait(self, name):
         # Best estimate: a weighted average of what they say and what they do.

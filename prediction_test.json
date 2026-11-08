@@ -1,7 +1,7 @@
 {
-  "version": "v2-draft",
-  "date": "2026-11-01",
-  "note": "Prediction test: 8 domains x 4 age groups. Same option ids and weights in every age version; only wording changes. Weights: 0.5 = published study, 0.25 = hypothesis. Model: multinomial logit (McFadden 1974), strength k. See the Prediction test tab in the Master Plan.",
+  "version": "v2.1-draft",
+  "date": "2026-11-08",
+  "note": "Prediction test: 8 domains x 4 age groups. Same option ids and weights in every age version; only wording changes. Weights: 0.5 = published study, 0.25 = hypothesis. Model: multinomial logit (McFadden 1974), strength k. See the Prediction test tab in the Master Plan. v2.1: every option has a Why Chain ladder (consequence and value, Reynolds & Gutman 1988; values from Schwartz). Weights and options unchanged, so results stay comparable with v2.",
   "age_groups": [
     "16-24",
     "25-44",
@@ -22,7 +22,11 @@
             "Openness": -0.5,
             "Conscientiousness": 0.5
           },
-          "basis": "Naumann et al. 2009"
+          "basis": "Naumann et al. 2009",
+          "ladder": {
+            "consequence": "goes with everything and needs no fuss",
+            "value": "security"
+          }
         },
         {
           "id": "statement",
@@ -31,7 +35,11 @@
             "Openness": 0.5,
             "Extraversion": 0.5
           },
-          "basis": "Naumann et al. 2009"
+          "basis": "Naumann et al. 2009",
+          "ladder": {
+            "consequence": "gets noticed and shows your own style",
+            "value": "stimulation"
+          }
         },
         {
           "id": "sporty",
@@ -40,7 +48,11 @@
             "Conscientiousness": 0.25,
             "Extraversion": 0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "is practical and ready for an active day",
+            "value": "achievement"
+          }
         },
         {
           "id": "vintage",
@@ -49,7 +61,11 @@
             "Openness": 0.5,
             "Conscientiousness": -0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "is unique and has a story, not mass-made",
+            "value": "self-direction"
+          }
         }
       ],
       "versions": {
@@ -85,7 +101,11 @@
             "Openness": -0.5,
             "Conscientiousness": 0.5
           },
-          "basis": "Gosling et al. 2002"
+          "basis": "Gosling et al. 2002",
+          "ladder": {
+            "consequence": "keeps the space calm and uncluttered",
+            "value": "security"
+          }
         },
         {
           "id": "art",
@@ -93,7 +113,11 @@
           "weights": {
             "Openness": 0.5
           },
-          "basis": "Gosling et al. 2002"
+          "basis": "Gosling et al. 2002",
+          "ladder": {
+            "consequence": "gives you something beautiful that inspires you every day",
+            "value": "universalism"
+          }
         },
         {
           "id": "photos",
@@ -102,7 +126,11 @@
             "Extraversion": 0.25,
             "Agreeableness": 0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "keeps the people you love close",
+            "value": "benevolence"
+          }
         },
         {
           "id": "shelves",
@@ -110,7 +138,11 @@
           "weights": {
             "Openness": 0.5
           },
-          "basis": "Gosling et al. 2002"
+          "basis": "Gosling et al. 2002",
+          "ladder": {
+            "consequence": "shows your interests and the things you have collected",
+            "value": "self-direction"
+          }
         }
       ],
       "versions": {
@@ -146,7 +178,11 @@
             "Openness": -0.5,
             "Emotional Stability": -0.25
           },
-          "basis": "Pliner & Hobden 1992"
+          "basis": "Pliner & Hobden 1992",
+          "ladder": {
+            "consequence": "is a sure, comforting meal",
+            "value": "security"
+          }
         },
         {
           "id": "new",
@@ -154,7 +190,11 @@
           "weights": {
             "Openness": 0.5
           },
-          "basis": "Pliner & Hobden 1992"
+          "basis": "Pliner & Hobden 1992",
+          "ladder": {
+            "consequence": "brings the fun of discovering something",
+            "value": "stimulation"
+          }
         },
         {
           "id": "healthy",
@@ -162,7 +202,11 @@
           "weights": {
             "Conscientiousness": 0.5
           },
-          "basis": "Keller & Siegrist 2015"
+          "basis": "Keller & Siegrist 2015",
+          "ladder": {
+            "consequence": "keeps you feeling light and looks after your health",
+            "value": "security"
+          }
         },
         {
           "id": "easy",
@@ -170,7 +214,11 @@
           "weights": {
             "Agreeableness": 0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "makes things easy for your friend",
+            "value": "benevolence"
+          }
         }
       ],
       "versions": {
@@ -203,7 +251,11 @@
           "weights": {
             "Openness": -0.25
           },
-          "basis": "Plog (travel personality)"
+          "basis": "Plog (travel personality)",
+          "ladder": {
+            "consequence": "means complete rest with no planning",
+            "value": "hedonism"
+          }
         },
         {
           "id": "city",
@@ -212,7 +264,11 @@
             "Openness": 0.5,
             "Extraversion": 0.5
           },
-          "basis": "Lee & Crompton 1992"
+          "basis": "Lee & Crompton 1992",
+          "ladder": {
+            "consequence": "offers lots to see, taste and do",
+            "value": "stimulation"
+          }
         },
         {
           "id": "nature",
@@ -221,7 +277,11 @@
             "Openness": 0.25,
             "Extraversion": -0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "brings peace, space and fresh air",
+            "value": "universalism"
+          }
         },
         {
           "id": "familiar",
@@ -229,7 +289,11 @@
           "weights": {
             "Openness": -0.5
           },
-          "basis": "Plog (travel personality)"
+          "basis": "Plog (travel personality)",
+          "ladder": {
+            "consequence": "gives the comfort of knowing it will be good",
+            "value": "security"
+          }
         }
       ],
       "versions": {
@@ -274,7 +338,11 @@
             "Extraversion": 0.25,
             "Agreeableness": 0.25
           },
-          "basis": "Rentfrow & Gosling 2003"
+          "basis": "Rentfrow & Gosling 2003",
+          "ladder": {
+            "consequence": "is music everyone knows and can sing along to",
+            "value": "conformity"
+          }
         },
         {
           "id": "rock",
@@ -282,7 +350,11 @@
           "weights": {
             "Openness": 0.25
           },
-          "basis": "Rentfrow & Gosling 2003"
+          "basis": "Rentfrow & Gosling 2003",
+          "ladder": {
+            "consequence": "brings energy and intensity",
+            "value": "stimulation"
+          }
         },
         {
           "id": "complex",
@@ -290,7 +362,11 @@
           "weights": {
             "Openness": 0.5
           },
-          "basis": "Rentfrow & Gosling 2003"
+          "basis": "Rentfrow & Gosling 2003",
+          "ladder": {
+            "consequence": "is something to listen to closely and think about",
+            "value": "self-direction"
+          }
         },
         {
           "id": "beat",
@@ -299,7 +375,11 @@
             "Extraversion": 0.5,
             "Agreeableness": 0.25
           },
-          "basis": "Rentfrow & Gosling 2003"
+          "basis": "Rentfrow & Gosling 2003",
+          "ladder": {
+            "consequence": "gives you energy to move",
+            "value": "hedonism"
+          }
         }
       ],
       "versions": {
@@ -342,7 +422,11 @@
             "Extraversion": 0.25,
             "Agreeableness": 0.25
           },
-          "basis": "Rentfrow, Goldberg & Zilca 2011"
+          "basis": "Rentfrow, Goldberg & Zilca 2011",
+          "ladder": {
+            "consequence": "means laughing and feeling good",
+            "value": "hedonism"
+          }
         },
         {
           "id": "thriller",
@@ -350,7 +434,11 @@
           "weights": {
             "Extraversion": 0.25
           },
-          "basis": "Rentfrow, Goldberg & Zilca 2011"
+          "basis": "Rentfrow, Goldberg & Zilca 2011",
+          "ladder": {
+            "consequence": "brings tension and excitement",
+            "value": "stimulation"
+          }
         },
         {
           "id": "documentary",
@@ -358,7 +446,11 @@
           "weights": {
             "Openness": 0.5
           },
-          "basis": "Rentfrow, Goldberg & Zilca 2011"
+          "basis": "Rentfrow, Goldberg & Zilca 2011",
+          "ladder": {
+            "consequence": "lets you learn and think",
+            "value": "self-direction"
+          }
         },
         {
           "id": "dark",
@@ -366,7 +458,11 @@
           "weights": {
             "Agreeableness": -0.25
           },
-          "basis": "Rentfrow, Goldberg & Zilca 2011"
+          "basis": "Rentfrow, Goldberg & Zilca 2011",
+          "ladder": {
+            "consequence": "explores the darker side of life",
+            "value": "stimulation"
+          }
         }
       ],
       "versions": {
@@ -400,7 +496,11 @@
             "Openness": -0.25,
             "Conscientiousness": 0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "means no worries, it just works",
+            "value": "security"
+          }
         },
         {
           "id": "sporty",
@@ -408,7 +508,11 @@
           "weights": {
             "Extraversion": 0.25
           },
-          "basis": "Zuckerman (sensation seeking)"
+          "basis": "Zuckerman (sensation seeking)",
+          "ladder": {
+            "consequence": "makes driving fun",
+            "value": "stimulation"
+          }
         },
         {
           "id": "electric",
@@ -416,7 +520,11 @@
           "weights": {
             "Openness": 0.25
           },
-          "basis": "Rogers (diffusion of innovations)"
+          "basis": "Rogers (diffusion of innovations)",
+          "ladder": {
+            "consequence": "brings the newest technology and less pollution",
+            "value": "universalism"
+          }
         },
         {
           "id": "big",
@@ -424,7 +532,11 @@
           "weights": {
             "Agreeableness": 0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "leaves room for the people you care about",
+            "value": "benevolence"
+          }
         }
       ],
       "versions": {
@@ -461,7 +573,11 @@
           "weights": {
             "Openness": 0.5
           },
-          "basis": "Rogers (diffusion of innovations)"
+          "basis": "Rogers (diffusion of innovations)",
+          "ladder": {
+            "consequence": "lets you be among the first to try new things",
+            "value": "stimulation"
+          }
         },
         {
           "id": "wait",
@@ -469,7 +585,11 @@
           "weights": {
             "Agreeableness": 0.25
           },
-          "basis": "Rogers (diffusion of innovations)"
+          "basis": "Rogers (diffusion of innovations)",
+          "ladder": {
+            "consequence": "means doing it together with the people you know",
+            "value": "conformity"
+          }
         },
         {
           "id": "data",
@@ -478,7 +598,11 @@
             "Conscientiousness": 0.25,
             "Emotional Stability": -0.25
           },
-          "basis": "Hypothesis"
+          "basis": "Hypothesis",
+          "ladder": {
+            "consequence": "keeps you safe and in control of your data",
+            "value": "security"
+          }
         },
         {
           "id": "ignore",
@@ -486,7 +610,11 @@
           "weights": {
             "Openness": -0.5
           },
-          "basis": "Rogers (diffusion of innovations)"
+          "basis": "Rogers (diffusion of innovations)",
+          "ladder": {
+            "consequence": "keeps what already works for you",
+            "value": "tradition"
+          }
         }
       ],
       "versions": {

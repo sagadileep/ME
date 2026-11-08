@@ -16,13 +16,38 @@ statements = ["Extraverted, enthusiastic",
     "Disorganized, careless",
     "Calm, emotionally stable",
     "Conventional, uncreative",]
-print("How well does each pair of words describe you?")
+
+# Plain words for each pair. The original TIPI words stay unchanged,
+# so scores still match the published questionnaire (Gosling et al. 2003).
+HELP = {
+    "Extraverted, enthusiastic": "outgoing, full of energy around people",
+    "Critical, quarrelsome": "often finds fault, gets into arguments",
+    "Dependable, self-disciplined": "reliable, keeps promises, sticks to plans",
+    "Anxious, easily upset": "worries a lot, gets upset quickly",
+    "Open to new experiences, complex": "curious, likes new ideas, thinks deeply",
+    "Reserved, quiet": "keeps to themselves, doesn't talk much",
+    "Sympathetic, warm": "caring and kind to others",
+    "Disorganized, careless": "messy, forgets things, not careful",
+    "Calm, emotionally stable": "relaxed, not easily stressed",
+    "Conventional, uncreative": "prefers the usual way, not very creative",
+}
+
+# Answering about yourself or about someone else?
+if person == answered_by:
+    lead = "I see myself as"
+    about = "you"
+else:
+    lead = f"I see {person} as"
+    about = person
+
+print(f"How well does each pair of words describe {about}?")
 print("1 = disagree strongly.... 4 = neutral ... 7 = agree strongly")
 
 answers = []
 
 for statement in statements:
-    question = f"I see myself as: {statement}  (1-7) "
+    print(f"\n   ({HELP[statement]})")
+    question = f"{lead}: {statement}  (1-7) "
     answer_text = input(question).strip()
     while not answer_text.isdigit() or int(answer_text) < 1 or int(answer_text) > 7:
         print("Please enter a number from 1-7")
@@ -54,4 +79,4 @@ record = {
                                     
 }
 save_result(record)
-print(f"\nsaved to results.json ({person}, answered by {answered_by}).")
+print(f"\nSaved to results.json ({person}, answered by {answered_by}).")
