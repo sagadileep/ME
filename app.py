@@ -32,6 +32,9 @@ KEEP_UNTIL = "31 March 2027"
 FEEDBACK_FILE = "feedback.json"
 SURVEYCIRCLE_CODE = os.environ.get("ME_SURVEYCIRCLE_CODE")   # set in the secrets; shown at the end
 REVEAL = os.environ.get("ME_REVEAL") == "1"   # show ME's guess next to each answer at the end
+# The team's own test plays: this first name (set in the secrets, never in the code) gets a "T-" code,
+# so analyze.py can leave it out. Upper or lower case and extra spaces don't matter.
+TEST_NAME = " ".join(os.environ.get("ME_TEST_NAME", "").lower().split())
 FEELINGS = ["Too long", "OK", "Quick"]
 
 START_STEPS = 3      # name, age and life stage count as real steps of the journey
@@ -207,6 +210,8 @@ if state.step == "start":
             state.scenes, state.version = load_scenes()
             if STUDY:
                 state.code = new_player_code()
+                if TEST_NAME and " ".join(name.lower().split()) == TEST_NAME:
+                    state.code = "T-" + state.code[2:]   # a test play, not a real player
                 save_play({"code": state.code, "status": "started", "last_step": "start",
                            "age_group": state.age_group, "life_stage": state.life_stage,
                            "scenes_version": state.version})

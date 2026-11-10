@@ -13,8 +13,9 @@ RUSH_LIMIT = 2   # players with this many speed-click reminders (or more) are le
 
 
 def load_rows(path):
+    # Test plays by the team have codes starting with "T-" and are left out.
     with open(path, encoding="utf-8") as file:
-        return list(csv.DictReader(file))
+        return [row for row in csv.DictReader(file) if not row["code"].startswith("T-")]
 
 
 def is_careless(row):
