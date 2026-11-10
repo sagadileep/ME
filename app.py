@@ -36,6 +36,12 @@ FEELINGS = ["Too long", "OK", "Quick"]
 START_STEPS = 3      # name, age and life stage count as real steps of the journey
 TEST_QUESTIONS = 8
 
+# Speed-click nudge (10 Nov): 3 answers in a row, each faster than this, shows a gentle reminder.
+# Answers are still saved; the count of reminders is saved too, so analysis can leave them out.
+RUSH_SECONDS = 1.5
+RUSH_STREAK = 3
+RUSH_MESSAGE = "Take your time: ME learns from your real choices, not from fast clicks."
+
 AGE_GROUPS = ["16-24", "25-44", "45-64", "65+"]
 LIFE_STAGES = ["school", "studying", "working", "retired", "home and family", "other"]
 REASONS = {reason: (case_a, case_b) for reason, case_a, case_b in DEPENDS_ON.values()}
@@ -76,9 +82,28 @@ def show_progress(chapter):
     brain_tree(shown)
 
 
+def rushing(times):
+    # True when the last few answers all came very fast.
+    recent = times[-RUSH_STREAK:]
+    return len(recent) == RUSH_STREAK and all(seconds < RUSH_SECONDS for seconds in recent)
+
+
+def note_rush(part, times):
+    # Remember which screen comes next, so the reminder stays there until that screen is answered.
+    if rushing(times):
+        state.rush_at = (part, len(times))
+        state.rush_count = state.get("rush_count", 0) + 1
+
+
+def show_rush_nudge(part, position):
+    if state.get("rush_at") == (part, position):
+        st.warning(RUSH_MESSAGE)
+
+
 def next_scene(entry):
     # Save one answer and move on to the next scene (or to the twin questions).
     state.log.append(entry)
+    note_rush("game", [e["seconds"] for e in state.log])
     state.depending = False
     state.scene_index += 1
     if STUDY:
@@ -106,6 +131,7 @@ def finish_game(followups):
         "log": state.log,
         "twin_followups": followups,
         "warnings": state.warnings,
+        "rush_nudges": state.get("rush_count", 0),
     }
     person = Profile(state.name)
     if LOCAL:
@@ -206,6 +232,7 @@ elif state.step == "scene":
             st.rerun()
 
     show_progress("Chapter 1 of 3 · You in everyday life")
+    show_rush_nudge("game", state.scene_index)
     st.subheader(text, anchor=False)
 
     if not state.depending:
@@ -294,9 +321,14 @@ elif state.step == "test":
     if state.q_index > 0 and st.button("← Back"):
         state.test_rows.pop()
         state.q_index -= 1
+        state.q_timer = None
         st.rerun()
 
+    if state.get("q_timer") != state.q_index:   # start the clock once per question
+        state.q_timer = state.q_index
+        state.q_shown_at = time.time()
     show_progress("Chapter 2 of 3 · Can ME guess you? No right or wrong answers")
+    show_rush_nudge("test", state.q_index)
     st.subheader(q["text"], anchor=False)
     pick = st.radio("Your choice", texts, index=None, key=f"pick_{q['id']}")
     never = None
@@ -323,7 +355,9 @@ elif state.step == "test":
                 "in_top_two": pick_id in order[:2],
                 "never_correct": never_id == order[-1] if never_id else None,
                 "chance_of_pick": round(chances[pick_id], 3),
+                "seconds": round(time.time() - state.q_shown_at, 1),
             })
+            note_rush("test", [row["seconds"] for row in state.test_rows])
             state.q_index += 1
             if state.q_index == len(state.questions) and STUDY:
                 save_play({"code": state.code, "status": "test_done", "last_step": "test_done",
