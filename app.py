@@ -12,7 +12,7 @@ from sincerity import sincerity_report, twin_check
 from storage import save_result
 from ai import ask_ai
 from ai_explain import build_prompt
-from person import Profile
+from person import Profile, MODEL
 from predict import load_test, question_for_age, predict, why_chain, why_text
 from style import apply_style, brain_tree
 import db
@@ -31,6 +31,7 @@ CONTACT = os.environ.get("ME_CONTACT", "the person who sent you this link")
 KEEP_UNTIL = "31 March 2027"
 FEEDBACK_FILE = "feedback.json"
 SURVEYCIRCLE_CODE = os.environ.get("ME_SURVEYCIRCLE_CODE")   # set in the secrets; shown at the end
+REVEAL = os.environ.get("ME_REVEAL") == "1"   # show ME's guess next to each answer at the end
 FEELINGS = ["Too long", "OK", "Quick"]
 
 START_STEPS = 3      # name, age and life stage count as real steps of the journey
@@ -132,6 +133,7 @@ def finish_game(followups):
         "twin_followups": followups,
         "warnings": state.warnings,
         "rush_nudges": state.get("rush_count", 0),
+        "model": MODEL,
     }
     person = Profile(state.name)
     if LOCAL:
@@ -396,6 +398,16 @@ elif state.step == "done":
     st.write(f"**Your answer in ME's top two:** {two} of {n} (random: 4 of 8)")
     st.write(f"**Never-pick correct:** {never} of {len(asked)} (random: 1 of 4)")
     st.write(f"**Average chance ME gave your real answers:** {round(average * 100)}% (random: 25%)")
+    if REVEAL:
+        lines = ["| Question | ME guessed | You chose | |", "|---|---|---|---|"]
+        for q, row in zip(state.questions, rows):
+            text_of = {option["id"]: option["text"] for option in q["options"]}
+            guess = max(row["chances"], key=row["chances"].get)
+            mark = "✓" if row["top_correct"] else ("½" if row["in_top_two"] else "✗")
+            lines.append(f"| {q.get('domain', q['id']).title()} | {text_of[guess]} | {text_of[row['pick']]} | {mark} |")
+        with st.expander("See ME's guess for each question"):
+            st.markdown("\n".join(lines))
+            st.caption("✓ ME's first guess was right · ½ your answer was ME's second guess · ✗ missed")
 
     st.subheader("What ME learned from the game", anchor=False)
     for dimension, score in state.profile.items():

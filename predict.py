@@ -5,7 +5,7 @@
 
 import json
 import math
-from person import Profile, START
+from person import Profile, typical
 
 TEST_FILE = "prediction_test.json"
 
@@ -32,7 +32,7 @@ def predict(profile, options, strength):
     for option in options:
         total = 0
         for trait, weight in option["weights"].items():
-            centred = (profile.trait(trait) - START) / 3
+            centred = (profile.trait(trait) - typical(trait)) / 3   # how far from a typical person
             total = total + weight * centred
         totals.append(total * strength)
     # 2. Softmax: turn the totals into chances that add up to 1.
@@ -61,12 +61,12 @@ def why_chain(profile, option, strength):
     ladder = option.get("ladder") or {}
     pushes = {}
     for trait, weight in option["weights"].items():
-        pushes[trait] = weight * (profile.trait(trait) - START) / 3 * strength
+        pushes[trait] = weight * (profile.trait(trait) - typical(trait)) / 3 * strength
     trait = max(pushes, key=pushes.get) if pushes else None
     if trait is None or pushes[trait] < STRONG_REASON:
         return {"strong": False, "consequence": ladder.get("consequence"), "value": ladder.get("value")}
 
-    direction = 1 if profile.trait(trait) > START else -1
+    direction = 1 if profile.trait(trait) > typical(trait) else -1
     evidence = []
     for entry in profile.log:
         change = entry.get("effects", {}).get(trait, 0)
@@ -108,4 +108,4 @@ if __name__ == "__main__":
         print(f"\n{question['domain']}: {text}")
         for number, option in enumerate(options):
             mark = "  <- ME's pick" if number == top else ("  <- never pick" if number == never else "")
-            print(f"  {round(chances[number] * 100)}%  {option['text']}{mark}")
+            print(f"  {round(chances[number] * 100)}%  {option['text']}{mark}")

@@ -2,6 +2,8 @@
 # Brings together what a person SAYS (questionnaire) and what they DO (game),
 # and combines them into one best estimate per trait.
 
+import json
+import os
 from storage import load_results
 from scoring import TRAITS
 from game import GAME_RESULTS_FILE
@@ -9,7 +11,30 @@ from game import GAME_RESULTS_FILE
 START = 4.0               # no information yet: the middle of the 1-7 scale
 QUESTIONNAIRE_WEIGHT = 2  # TIPI measures each trait with 2 questions
 GAP = 1.5                 # says vs does this far apart is worth noticing
-PRIOR_STRENGTH = 2        # shrinkage: every estimate starts with 2 'neutral' scenes at 4.0
+PRIOR_STRENGTH = 2        # shrinkage: every estimate starts with 2 'neutral' scenes at the typical value
+
+# Switch (set ME_NORMS=1 in the secrets, planned after Gate 2 on 16 Nov): start every trait at the
+# real average of 592,359 people (norms.json) and measure people against that, not against 4.
+USE_NORMS = os.environ.get("ME_NORMS") == "1"
+MODEL = "norms-v1" if USE_NORMS else "start-4"   # saved with every game, so batches can be compared
+NORMS_FILE = "norms.json"
+
+
+def load_norms():
+    try:
+        with open(NORMS_FILE, encoding="utf-8") as file:
+            return {name: values["mean"] for name, values in json.load(file)["traits"].items()}
+    except (OSError, KeyError, ValueError):
+        return {}   # no file: fall back to the middle of the scale
+
+
+NORMS = load_norms() if USE_NORMS else {}
+
+
+def typical(name):
+    # Where an average person sits on this trait (4.0 for traits without real data).
+    return NORMS.get(name, START)
+
 
 class Profile:
     def __init__(self, name):
@@ -43,7 +68,7 @@ class Profile:
 
     def trait(self, name):
         # Best estimate: a weighted average of what they say and what they do.
-        total = START * PRIOR_STRENGTH
+        total = typical(name) * PRIOR_STRENGTH
         weights = PRIOR_STRENGTH
         if name in self.says:
             total = total + self.says[name] * QUESTIONNAIRE_WEIGHT
@@ -58,7 +83,7 @@ class Profile:
         # Game score pulled toward the middle when it rests on few scenes.
         scenes = self.evidence.get(name, 1)
         raw = self.does[name]
-        return round((raw * scenes + START * PRIOR_STRENGTH) / (scenes + PRIOR_STRENGTH), 2)
+        return round((raw * scenes + typical(name) * PRIOR_STRENGTH) / (scenes + PRIOR_STRENGTH), 2)
     
     def gaps(self):
         # Traits where what the person says and what they do differ a lot.
@@ -86,4 +111,4 @@ if __name__ == "__main__":
         person = Profile(name)
         person.load()
         person.summary()
-        print()
+        print()

@@ -33,6 +33,8 @@ def show_funnel(rows):
         print("  stopped early at:", ", ".join(f"{step} ({n})" for step, n in stopped.most_common()))
     print("  age groups:", dict(Counter(row["age_group"] for row in rows)))
     print("  life stages:", dict(Counter(row["life_stage"] for row in rows)))
+    models = Counter(json.loads(row["game"]).get("model", "start-4") for row in rows if row["game"])
+    print("  ME version used:", dict(models))
 
 
 def show_feedback(rows):
