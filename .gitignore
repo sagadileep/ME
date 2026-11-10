@@ -5,3 +5,4 @@ results.json
 game_results.json
 test_results.json
 feedback.json
+*.csv
