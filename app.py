@@ -484,4 +484,6 @@ elif state.step == "done":
             except Exception:
                 status.update(label="The AI is busy right now. Please try again in a minute.", state="error")
     if state.get("explanation"):
+        # Fixed text from the app, not from the AI, so it is always there and always the same.
+        st.caption("ME did the thinking: your choices, its guesses, the reasons. An AI just put it into words.")
         st.markdown(state.explanation)
