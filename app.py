@@ -322,6 +322,14 @@ elif state.step == "chapter2":
         st.rerun()
 
 elif state.step == "test":
+    if state.q_index >= len(state.questions):
+        # All answered, but the move to the results was interrupted (a double-click on "Next"
+        # or the app restarting mid-click). Save again and go on, instead of crashing.
+        if STUDY:
+            save_play({"code": state.code, "status": "test_done", "last_step": "test_done",
+                       "test_version": state.test["version"], "test": state.test_rows})
+        state.step = "done"
+        st.rerun()
     q = state.questions[state.q_index]
     ask_never = state.q_index % 2 == 0   # never-pick on 4 of the 8 questions
     texts = [option["text"] for option in q["options"]]
