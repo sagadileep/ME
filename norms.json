@@ -1,0 +1,27 @@
+{
+  "source": "IPIP-FFM open dataset, openpsychometrics.org, 2016-2018",
+  "people": 592359,
+  "scale": "1-7",
+  "traits": {
+    "Openness": {
+      "mean": 5.41,
+      "sd": 0.93
+    },
+    "Conscientiousness": {
+      "mean": 4.52,
+      "sd": 1.11
+    },
+    "Extraversion": {
+      "mean": 3.87,
+      "sd": 1.37
+    },
+    "Agreeableness": {
+      "mean": 5.14,
+      "sd": 1.1
+    },
+    "Emotional Stability": {
+      "mean": 3.88,
+      "sd": 1.29
+    }
+  }
+}
