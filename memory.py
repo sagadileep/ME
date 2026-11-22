@@ -1,5 +1,5 @@
 # ME - private memory
-# Everything ME remembers about you: your notes, daily check-ins and conversations.
+# Everything ME remembers about you: its notes about you and your conversations.
 # On the laptop: one file, my_memory.json (kept out of GitHub by .gitignore).
 # Online (phone): one row in your own private Supabase project, set by PRIVATE_SUPABASE_URL and _KEY.
 
@@ -33,7 +33,7 @@ def database():
 
 
 def load_memory():
-    empty = {"about": "", "checkins": [], "chat": []}
+    empty = {"about": "", "notes_upto": 0, "chat": []}   # notes_upto: messages already in the notes
     db = database()
     if db:
         rows = db.table("private_memory").select("data").eq("id", MEMORY_ROW).execute().data
@@ -68,37 +68,15 @@ def add_message(memory, role, text, verses=None):
     save_memory(memory)
 
 
-def add_checkin(memory, checkin):
-    checkin["date"] = today()
-    memory["checkins"] = [c for c in memory["checkins"] if c["date"] != checkin["date"]]   # one per day
-    memory["checkins"].append(checkin)
-    save_memory(memory)
+def hours_since_last(memory):
+    # Hours since the last message in the chat, or None if there is none yet.
+    if not memory["chat"]:
+        return None
+    last = datetime.strptime(memory["chat"][-1]["time"], "%Y-%m-%d %H:%M")
+    current = datetime.strptime(now(), "%Y-%m-%d %H:%M")
+    return (current - last).total_seconds() / 3600
 
 
-def last_plan(memory):
-    # The most recent check-in before today that had a plan, so ME can ask how it went.
-    for checkin in reversed(memory["checkins"]):
-        if checkin["date"] < today() and checkin.get("plan"):
-            return checkin
-    return None
-
-
-def checkins_text(memory, days=7):
-    lines = []
-    for c in memory["checkins"][-days:]:
-        line = f"{c['date']}: mood {c.get('mood', '?')}."
-        if c.get("on_mind"):
-            line += f" On his mind: {c['on_mind']}."
-        if c.get("decision"):
-            line += f" Decision and why: {c['decision']}."
-        if c.get("plan"):
-            line += f" Plan for the next day: {c['plan']}."
-        if c.get("plan_result"):
-            line += f" Previous plan ({c.get('previous_plan', '')}): {c['plan_result']}. {c.get('plan_why', '')}"
-        lines.append(line)
-    return "\n".join(lines) if lines else "No check-ins yet."
-
-
-def chat_text(memory, messages=12):
+def chat_text(messages):
     names = {"user": "Dileep", "assistant": "ME"}
-    return "\n".join(f"{names[m['role']]}: {m['text']}" for m in memory["chat"][-messages:]) or "This is the first conversation."
+    return "\n".join(f"[{m['time']}] {names[m['role']]}: {m['text']}" for m in messages) or "(no messages yet)"
