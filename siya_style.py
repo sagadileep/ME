@@ -2,6 +2,7 @@
 # Only this app uses it; the public study app keeps its own light ME look.
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 COLORS = {
     "night": "#0B0C10",      # page
@@ -23,8 +24,9 @@ CSS = """
   --text: {text}; --muted: {muted}; --gold: {gold}; --you: {you};
 }}
 
-/* Page */
-.stApp, [data-testid="stAppViewContainer"], [data-testid="stBottom"], [data-testid="stBottom"] > div {{
+/* Page (html and body too: the phone shows them behind its status bar) */
+:root {{ color-scheme: dark; }}
+html, body, [data-testid="stHeader"], .stApp, [data-testid="stAppViewContainer"], [data-testid="stBottom"], [data-testid="stBottom"] > div {{
   background: var(--night) !important;
 }}
 .stApp {{
@@ -38,7 +40,7 @@ html, body, .stApp, .stApp p, .stApp li, .stApp label, .stApp input, .stApp text
 .block-container {{ max-width: 720px; padding: 1.2rem 1rem 6rem; }}
 
 /* Hide Streamlit's own chrome so it feels like an app */
-[data-testid="stHeader"] {{ background: transparent; height: 0; }}
+[data-testid="stHeader"] {{ display: none !important; }}
 [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"],
 #MainMenu, footer {{ display: none !important; }}
 
@@ -139,8 +141,29 @@ html, body, .stApp, .stApp p, .stApp li, .stApp label, .stApp input, .stApp text
 """.format(**COLORS)
 
 
+# Tells the phone's browser to colour its status bar and home-screen app dark, and names the app "Siya".
+THEME_SCRIPT = """
+<script>
+const head = window.parent.document.head;
+function setMeta(name, content) {{
+  let tag = head.querySelector(`meta[name="${{name}}"]`);
+  if (!tag) {{ tag = window.parent.document.createElement("meta"); tag.name = name; head.appendChild(tag); }}
+  tag.content = content;
+}}
+setMeta("theme-color", "{night}");
+setMeta("apple-mobile-web-app-capable", "yes");
+setMeta("mobile-web-app-capable", "yes");
+setMeta("apple-mobile-web-app-status-bar-style", "black-translucent");
+setMeta("apple-mobile-web-app-title", "Siya");
+window.parent.document.documentElement.style.background = "{night}";
+window.parent.document.body.style.background = "{night}";
+</script>
+""".format(**COLORS)
+
+
 def siya_style():
     st.markdown(CSS, unsafe_allow_html=True)
+    components.html(THEME_SCRIPT, height=0)
 
 
 def header(tagline):
