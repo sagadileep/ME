@@ -2,6 +2,7 @@
 # With ANTHROPIC_API_KEY in the secrets, Siya uses Claude: Sonnet for her replies (warm, careful writing)
 # and Haiku for quick background jobs (picking verses, updating notes). Without it, she uses Gemini.
 # Replies are streamed: the words appear while she is still writing.
+# If Claude fails (key expired, no credit, outage), Siya quietly falls back to Gemini.
 
 import os
 
@@ -41,20 +42,30 @@ def gemini():
 def ask_fast(prompt):
     # A quick background answer, all at once.
     if using_claude():
-        message = claude().messages.create(model=FAST_MODEL, max_tokens=MAX_TOKENS,
-                                           messages=[{"role": "user", "content": prompt}])
-        return "".join(block.text for block in message.content if block.type == "text")
+        try:
+            message = claude().messages.create(model=FAST_MODEL, max_tokens=MAX_TOKENS,
+                                               messages=[{"role": "user", "content": prompt}])
+            return "".join(block.text for block in message.content if block.type == "text")
+        except Exception as error:
+            print(f"Claude failed, using Gemini: {type(error).__name__}", flush=True)
     return gemini().models.generate_content(model=GEMINI_MODEL, contents=prompt).text
 
 
 def stream_reply(prompt):
     # Siya's reply, piece by piece, so it can appear on screen while she writes.
+    started = False
     if using_claude():
-        with claude().messages.stream(model=REPLY_MODEL, max_tokens=MAX_TOKENS,
-                                      messages=[{"role": "user", "content": prompt}]) as stream:
-            for text in stream.text_stream:
-                yield text
-    else:
-        for chunk in gemini().models.generate_content_stream(model=GEMINI_MODEL, contents=prompt):
-            if chunk.text:
-                yield chunk.text
+        try:
+            with claude().messages.stream(model=REPLY_MODEL, max_tokens=MAX_TOKENS,
+                                          messages=[{"role": "user", "content": prompt}]) as stream:
+                for text in stream.text_stream:
+                    started = True
+                    yield text
+            return
+        except Exception as error:
+            print(f"Claude failed, using Gemini: {type(error).__name__}", flush=True)
+            if started:
+                return            # half a reply is already on screen; don't add a second one
+    for chunk in gemini().models.generate_content_stream(model=GEMINI_MODEL, contents=prompt):
+        if chunk.text:
+            yield chunk.text
