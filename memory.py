@@ -5,6 +5,7 @@
 
 import json
 import os
+from urllib.parse import urlparse
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -25,7 +26,9 @@ def database():
         return None
     if _client is None:
         from supabase import create_client
-        _client = create_client(url, key)
+        address = urlparse(url.strip())
+        # Keep only "https://<project>.supabase.co": the library adds paths like /rest/v1 itself.
+        _client = create_client(f"{address.scheme}://{address.netloc}", key.strip())
     return _client
 
 
