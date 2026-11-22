@@ -78,5 +78,5 @@ def hours_since_last(memory):
 
 
 def chat_text(messages):
-    names = {"user": "Dileep", "assistant": "ME"}
+    names = {"user": "Dileep", "assistant": "Siya"}
     return "\n".join(f"[{m['time']}] {names[m['role']]}: {m['text']}" for m in messages) or "(no messages yet)"
