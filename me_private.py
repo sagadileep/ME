@@ -12,7 +12,7 @@ import streamlit as st
 
 st.set_page_config(page_title="Siya", page_icon="🪷", layout="centered", initial_sidebar_state="collapsed")
 
-from ai import ask_ai
+from siya_ai import ask_fast, stream_reply
 from gita import find_refs, load_gita, quote as gita_quote
 from memory import add_message, chat_text, hours_since_last, load_memory, now, save_memory
 from ramayana import KEY_STORIES, key_story_refs, load_ramayana, quote as ramayana_quote, search
@@ -108,18 +108,32 @@ def ramayana():
     return load_ramayana()
 
 
-def context(memory):
+def context(memory, skip_last=False):
+    chat = memory["chat"][:-1] if skip_last else memory["chat"]
     return f"""What you know about Dileep (your own notes):
 {memory['about'] or 'Nothing yet. You are just getting to know him.'}
 
 Earlier conversation (latest last; times are Berlin time):
-{chat_text(memory['chat'][-RECENT:])}
+{chat_text(chat[-RECENT:])}
 
 Time now: {now()}"""
 
 
+HEAVY_WORDS = ("gita", "ramayana", "krishna", "rama", "sita", "hanuman", "verse", "sad", "angry", "anger",
+               "upset", "stress", "worried", "worry", "afraid", "scared", "lonely", "alone", "hurt", "lost",
+               "confused", "decide", "decision", "should i", "give up", "fail", "tired of", "hopeless", "cry")
+
+
+def needs_passages(message):
+    # Casual messages skip the verse search completely, so Siya answers faster.
+    lowered = message.lower()
+    return len(lowered.split()) >= 12 or any(word in lowered for word in HEAVY_WORDS)
+
+
 def pick_passages(memory, message):
     # One quick AI call suggests passages; only passages that really exist are kept.
+    if not needs_passages(message):
+        return [], []
     stories = "\n".join(f"- {key}: {about}" for key, (about, refs) in KEY_STORIES.items())
     prompt = f"""Dileep is chatting with his AI friend Siya. Is he struggling, facing a decision, or asking about
 the Gita or the Ramayana? If so, which passages would truly help? Most casual messages need none.
@@ -134,7 +148,7 @@ Key Ramayana stories:
 {chat_text(memory['chat'][-4:])}
 Dileep: {message}"""
     try:
-        reply = ask_ai(prompt)
+        reply = ask_fast(prompt)
     except Exception:
         return [], []
     lines = {k.strip().upper(): v.strip() for k, _, v in (line.partition(":") for line in reply.splitlines()) if v}
@@ -153,9 +167,10 @@ def sources(gita_refs, ramayana_refs):
     return "\n".join(texts) or "None this time."
 
 
-def reply_to(memory, message, gita_refs, ramayana_refs):
-    return ask_ai(f"""{GUIDE}
-{context(memory)}
+def reply_prompt(memory, message, gita_refs, ramayana_refs):
+    # The new message is already saved, so the earlier conversation leaves it out (it comes at the end).
+    return (f"""{GUIDE}
+{context(memory, skip_last=True)}
 
 Passages you may quote in this answer:
 {sources(gita_refs, ramayana_refs)}
@@ -165,7 +180,7 @@ Dileep: {message}
 Siya:""")
 
 
-def opening(memory):
+def opening_prompt(memory):
     # Siya writes first when you open the app after a while.
     hours = hours_since_last(memory)
     if hours is None:
@@ -177,7 +192,7 @@ def opening(memory):
                      "Text him first, like a friend: greet him in a way that fits the time of day and, if you "
                      "can, follow up on something real he told you before, especially a plan whose day has "
                      "passed. Otherwise ask one thing you would like to know about him.")
-    return ask_ai(f"""{GUIDE}
+    return (f"""{GUIDE}
 {context(memory)}
 
 {situation}
@@ -188,7 +203,7 @@ Siya:""")
 def update_notes(memory):
     # Siya rewrites her notes about you from the new messages: only facts you said, never guesses.
     new = memory["chat"][memory.get("notes_upto", 0):]
-    notes = ask_ai(f"""You keep private notes about Dileep for his AI friend Siya.
+    notes = ask_fast(f"""You keep private notes about Dileep for his AI friend Siya.
 
 Current notes:
 {memory['about'] or '(empty)'}
@@ -246,27 +261,54 @@ if PASSWORD and not st.session_state.get("unlocked"):
 header("walks beside you")
 memory = load_memory()
 
-if not st.session_state.get("greeted"):
-    st.session_state.greeted = True
-    hours = hours_since_last(memory)
-    if hours is None or hours >= NEW_SESSION_HOURS:
-        with st.spinner("Siya is typing…"):
-            add_message(memory, "assistant", opening(memory))
+
+def without_name(chunks):
+    # Drops a leading "Siya:" if the AI writes one.
+    start = ""
+    for chunk in chunks:
+        if start is not None:
+            start += chunk
+            if len(start) < 6:
+                continue
+            chunk, start = start.removeprefix("Siya:").lstrip(), None
+        yield chunk
+    if start:
+        yield start.removeprefix("Siya:").lstrip()
+
+
+def stream_message(prompt, gita_refs=(), ramayana_refs=()):
+    # Shows Siya's words as they arrive, then redraws them as proper bubbles and saves them.
+    live = st.empty()
+    with live.container():
+        with st.chat_message("assistant", avatar=SIYA_AVATAR):
+            text = st.write_stream(without_name(stream_reply(prompt)))
+    live.empty()
+    text = text if isinstance(text, str) else "".join(map(str, text))
+    add_message(memory, "assistant", text.strip(), list(gita_refs))
+    memory["chat"][-1]["ramayana"] = list(ramayana_refs)
+    save_memory(memory)
+    show(memory["chat"][-1])
+
 
 for message in memory["chat"][-40:]:
     show(message)
 
+if not st.session_state.get("greeted"):
+    st.session_state.greeted = True
+    hours = hours_since_last(memory)
+    if hours is None or hours >= NEW_SESSION_HOURS:
+        stream_message(opening_prompt(memory))
+
 text = st.chat_input("Message Siya")
 if text:
     show({"role": "user", "text": text})
-    with st.spinner("Siya is typing…"):
-        gita_refs, ramayana_refs = pick_passages(memory, text)
-        answer = reply_to(memory, text, gita_refs, ramayana_refs)
+    if needs_passages(text):
+        with st.spinner("Siya is thinking…"):
+            gita_refs, ramayana_refs = pick_passages(memory, text)
+    else:
+        gita_refs, ramayana_refs = [], []
     add_message(memory, "user", text)
-    add_message(memory, "assistant", answer, gita_refs)
-    memory["chat"][-1]["ramayana"] = ramayana_refs
-    save_memory(memory)
-    show(memory["chat"][-1])
+    stream_message(reply_prompt(memory, text, gita_refs, ramayana_refs), gita_refs, ramayana_refs)
     if len(memory["chat"]) - memory.get("notes_upto", 0) >= NOTES_EVERY:
         update_notes(memory)
 
